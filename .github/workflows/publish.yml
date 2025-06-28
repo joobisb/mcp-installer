@@ -53,34 +53,59 @@ jobs:
         run: pnpm -r run test
 
       - name: Configure git for version bumping
-        if: github.event_name == 'workflow_dispatch'
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
-      - name: Bump package versions
-        if: github.event_name == 'workflow_dispatch'
+      - name: Get current published version
         run: |
-          # Bump version in both packages to keep them in sync
+          # Get current version from npm registry (source of truth)
+          CURRENT_NPM_VERSION=$(npm view @mcp-installer/cli version 2>/dev/null || echo "0.0.0")
+          echo "CURRENT_NPM_VERSION=$CURRENT_NPM_VERSION" >> $GITHUB_ENV
+          echo "📦 Current published version: $CURRENT_NPM_VERSION"
+
+      - name: Calculate next version
+        run: |
+          # Install semver for version calculation
+          npm install -g semver
+          
+          BUMP_TYPE=${{ github.event.inputs.version }}
+          CURRENT_VERSION=${{ env.CURRENT_NPM_VERSION }}
+          
+          # Calculate next version using semver
+          NEXT_VERSION=$(semver -i $BUMP_TYPE $CURRENT_VERSION)
+          echo "NEW_VERSION=$NEXT_VERSION" >> $GITHUB_ENV
+          echo "🚀 Next version will be: $NEXT_VERSION"
+
+      - name: Pre-flight checks
+        run: |
+          echo "🔍 Running pre-flight checks..."
+          
+          # Check if version already exists on npm
+          if npm view @mcp-installer/cli@${{ env.NEW_VERSION }} version 2>/dev/null; then
+            echo "❌ Version ${{ env.NEW_VERSION }} already published to npm"
+            exit 1
+          fi
+          
+          if npm view @mcp-installer/shared@${{ env.NEW_VERSION }} version 2>/dev/null; then
+            echo "❌ Version ${{ env.NEW_VERSION }} already published to npm"
+            exit 1
+          fi
+          
+          echo "✅ Version ${{ env.NEW_VERSION }} is available for publishing"
+
+      - name: Bump package versions (no commit yet)
+        run: |
+          echo "📝 Bumping package versions to ${{ env.NEW_VERSION }}..."
+          
+          # Bump versions but don't commit yet (wait for successful publish)
           cd packages/shared
-          npm version ${{ github.event.inputs.version }} --no-git-tag-version
-          NEW_VERSION=$(node -p "require('./package.json').version")
+          npm version ${{ env.NEW_VERSION }} --no-git-tag-version
           
           cd ../cli
-          npm version $NEW_VERSION --no-git-tag-version
+          npm version ${{ env.NEW_VERSION }} --no-git-tag-version
           
-          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
-          
-          # Commit version changes
-          cd ../..
-          git add packages/*/package.json
-          git commit -m "chore: bump version to $NEW_VERSION"
-
-      - name: Extract version from tag
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          TAG_VERSION=${GITHUB_REF#refs/tags/v}
-          echo "NEW_VERSION=$TAG_VERSION" >> $GITHUB_ENV
+          echo "✅ Versions updated in package.json files"
 
       - name: Verify workspace dependency conversion
         run: |
@@ -93,23 +118,35 @@ jobs:
         if: github.event.inputs.dry_run == 'true'
         run: |
           echo "🧪 DRY RUN MODE - No packages will be published"
-          echo "Would publish:"
-          echo "  📦 @mcp-installer/shared@${{ env.NEW_VERSION || 'current' }}"
-          echo "  🖥️ @mcp-installer/cli@${{ env.NEW_VERSION || 'current' }}"
+          echo "📊 Version Information:"
+          echo "  Current npm version: ${{ env.CURRENT_NPM_VERSION }}"
+          echo "  Bump type: ${{ github.event.inputs.version }}"
+          echo "  Next version: ${{ env.NEW_VERSION }}"
+          echo ""
+          echo "📦 Would publish:"
+          echo "  📦 @mcp-installer/shared@${{ env.NEW_VERSION }}"
+          echo "  🖥️ @mcp-installer/cli@${{ env.NEW_VERSION }}"
+          echo ""
+          echo "🔍 Testing publish commands..."
           
           # Test publish commands without actually publishing
           cd packages/shared
           pnpm publish --dry-run --access public
           cd ../cli  
           pnpm publish --dry-run
+          
+          echo ""
+          echo "✅ Dry run completed successfully"
+          echo "🚀 Run without --dry-run to actually publish"
 
       # CRITICAL: Publish shared package FIRST
       - name: Publish shared package
         if: github.event.inputs.dry_run != 'true'
         run: |
-          echo "📦 Publishing @mcp-installer/shared..."
+          echo "📦 Publishing @mcp-installer/shared@${{ env.NEW_VERSION }}..."
           cd packages/shared
           pnpm publish --access public --no-git-checks
+          echo "✅ @mcp-installer/shared published successfully"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -124,13 +161,41 @@ jobs:
       - name: Publish CLI package
         if: github.event.inputs.dry_run != 'true'
         run: |
-          echo "🖥️ Publishing @mcp-installer/cli..."
+          echo "🖥️ Publishing @mcp-installer/cli@${{ env.NEW_VERSION }}..."
           cd packages/cli
           echo "Final CLI dependencies before publish:"
           node -p "require('./package.json').dependencies['@mcp-installer/shared']"
           pnpm publish --no-git-checks
+          echo "✅ @mcp-installer/cli published successfully"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # IMPORTANT: Only commit and push AFTER successful publish
+      - name: Commit and push version changes
+        if: github.event.inputs.dry_run != 'true' && success()
+        run: |
+          echo "💾 Committing version changes to repository..."
+          
+          # Add and commit the version changes
+          git add packages/*/package.json
+          git commit -m "chore: bump version to ${{ env.NEW_VERSION }}"
+          
+          # Create and push tag
+          git tag "v${{ env.NEW_VERSION }}"
+          
+          # Push changes and tag
+          git push origin ${{ github.ref_name }}
+          git push origin "v${{ env.NEW_VERSION }}"
+          
+          echo "✅ Version ${{ env.NEW_VERSION }} committed and pushed to repository"
+
+      # Cleanup on failure - reset package.json files
+      - name: Cleanup on failure
+        if: failure()
+        run: |
+          echo "🧹 Cleaning up failed publish attempt..."
+          git checkout -- packages/*/package.json || true
+          echo "✅ Package.json files reset to original state"
 
       - name: Verify published packages
         if: github.event.inputs.dry_run != 'true'
@@ -151,7 +216,7 @@ jobs:
           echo "$CLI_DEPS" | jq -r '.["@mcp-installer/shared"]' || echo "Could not verify dependency"
 
       - name: Create GitHub release
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run != 'true'
+        if: github.event.inputs.dry_run != 'true' && success()
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -170,8 +235,18 @@ jobs:
             npm install -g @mcp-installer/cli@${{ env.NEW_VERSION }}
             ```
             
+            ### 🔄 Upgrade from Previous Version
+            ```bash
+            npm update -g @mcp-installer/cli
+            ```
+            
             ### 🔗 Links
             - [npm: @mcp-installer/cli](https://www.npmjs.com/package/@mcp-installer/cli)
             - [npm: @mcp-installer/shared](https://www.npmjs.com/package/@mcp-installer/shared)
+            - [GitHub Repository](https://github.com/joobisb/mcp-installer)
+            
+            ### 📋 What's Changed
+            This release was automatically published from the latest main branch.
+            See the [commit history](https://github.com/joobisb/mcp-installer/commits/v${{ env.NEW_VERSION }}) for detailed changes.
           draft: false
           prerelease: false
