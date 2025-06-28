@@ -64,7 +64,7 @@ export async function backupCommand(options: BackupOptions): Promise<void> {
     const backups: BackupInfo[] = [];
     const errors: string[] = [];
 
-    console.log(chalk.cyan(`\\nBacking up ${targetClients.length} client(s)...`));
+    console.log(chalk.cyan(`\nBacking up ${targetClients.length} client(s)...`));
 
     for (const clientType of targetClients) {
       const clientInfo = allClients.find(c => c.type === clientType)!;
@@ -76,7 +76,7 @@ export async function backupCommand(options: BackupOptions): Promise<void> {
         
         spinner.succeed(chalk.green(`Backed up ${getClientDisplayName(clientType)}`));
         console.log(chalk.dim(`  ${backupInfo.backupPath}`));
-      } catch (error) {
+      } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         errors.push(`${getClientDisplayName(clientType)}: ${errorMessage}`);
         spinner.fail(chalk.red(`Failed to backup ${getClientDisplayName(clientType)}: ${errorMessage}`));
@@ -85,26 +85,26 @@ export async function backupCommand(options: BackupOptions): Promise<void> {
 
     spinner.succeed(chalk.green('Backup process completed'));
 
-    console.log(chalk.cyan('\\nBackup Summary:'));
+    console.log(chalk.cyan('\nBackup Summary:'));
     console.log(chalk.green(`  ✓ Successful: ${backups.length}`));
     if (errors.length > 0) {
       console.log(chalk.red(`  ✗ Failed: ${errors.length}`));
-      console.log(chalk.red('\\nErrors:'));
-      errors.forEach(error => console.log(chalk.red(`  • ${error}`)));
+      console.log(chalk.red('\nErrors:'));
+      errors.forEach((error: unknown) => console.log(chalk.red(`  • ${error}`)));
     }
 
     if (backups.length > 0) {
-      console.log(chalk.cyan('\\nBackup Details:'));
+      console.log(chalk.cyan('\nBackup Details:'));
       backups.forEach(backup => {
         console.log(`  ${getClientDisplayName(backup.client)}: ${chalk.dim(backup.backupPath)}`);
         console.log(`    Created: ${formatTimestamp(backup.timestamp)}`);
       });
 
-      console.log(chalk.yellow('\\nTo restore a backup:'));
+      console.log(chalk.yellow('\nTo restore a backup:'));
       console.log(chalk.white(`  mcp-installer restore <backup-path>`));
     }
 
-  } catch (error) {
+  } catch (error: unknown) {
     spinner.fail(chalk.red('Backup failed'));
     console.error(chalk.red(error instanceof Error ? error.message : 'Unknown error'));
     process.exit(1);

@@ -12,7 +12,12 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "declaration": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "baseUrl": "../..",
+    "paths": {
+      "@mcp-installer/shared": ["packages/shared/src/index.ts"],
+      "@mcp-installer/shared/*": ["packages/shared/src/*"]
+    }
   },
   "references": [
     { "path": "../shared" }

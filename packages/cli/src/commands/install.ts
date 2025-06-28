@@ -76,13 +76,13 @@ export async function installCommand(serverName: string, options: InstallOptions
     
     if (!validation.isValid) {
       spinner.fail(chalk.red('Server validation failed'));
-      validation.errors.forEach(error => console.log(chalk.red(`  ✗ ${error}`)));
+      validation.errors.forEach((error: string) => console.log(chalk.red(`  ✗ ${error}`)));
       return;
     }
 
     if (validation.warnings.length > 0) {
       spinner.warn(chalk.yellow('Server validation warnings:'));
-      validation.warnings.forEach(warning => console.log(chalk.yellow(`  ⚠ ${warning}`)));
+      validation.warnings.forEach((warning: string) => console.log(chalk.yellow(`  ⚠ ${warning}`)));
     }
 
     if (options.dryRun) {

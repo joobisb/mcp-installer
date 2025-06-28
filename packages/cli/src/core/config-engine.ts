@@ -7,8 +7,7 @@ import {
   ClientConfig, 
   MCPServerConfig, 
   ValidationResult,
-  BackupInfo,
-  deepClone 
+  BackupInfo
 } from '@mcp-installer/shared';
 
 export class ConfigEngine {
@@ -111,9 +110,15 @@ export class ConfigEngine {
         }
 
         for (const [serverId, serverConfig] of Object.entries(config.mcpServers)) {
+          if (!serverConfig) {
+            result.errors.push(`Server '${serverId}' has empty configuration`);
+            result.isValid = false;
+            continue;
+          }
+
           // Check if it's a remote server (has url) or local server (has command)
-          const isRemoteServer = serverConfig.url;
-          const isLocalServer = serverConfig.command;
+          const isRemoteServer = !!serverConfig.url;
+          const isLocalServer = !!serverConfig.command;
 
           if (!isRemoteServer && !isLocalServer) {
             result.errors.push(`Server '${serverId}' must have either 'command' (for local servers) or 'url' (for remote servers)`);
@@ -122,7 +127,7 @@ export class ConfigEngine {
 
           // Validate local server configuration
           if (isLocalServer) {
-            if (!Array.isArray(serverConfig.args)) {
+            if (serverConfig.args && !Array.isArray(serverConfig.args)) {
               result.errors.push(`Server '${serverId}' 'args' must be an array`);
               result.isValid = false;
             }
@@ -218,12 +223,9 @@ export class ConfigEngine {
     return 'claude-desktop'; // default
   }
 
-  private inferOriginalPath(backupPath: string): string {
+  private inferOriginalPath(_backupPath: string): string {
     // Extract original path from backup filename
     // This is a simplified implementation
-    const fileName = basename(backupPath);
-    const originalName = fileName.split('.').slice(0, -2).join('.');
-    
     // This would need more sophisticated logic to determine the original path
     throw new Error('Cannot infer original path from backup. Please specify target path.');
   }

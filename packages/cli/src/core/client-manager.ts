@@ -58,7 +58,7 @@ export class ClientManager {
   async detectInstalledClients(): Promise<ClientInfo[]> {
     const clients: ClientInfo[] = [];
 
-    for (const [type, config] of Object.entries(ClientManager.CLIENT_CONFIGS)) {
+    for (const [type] of Object.entries(ClientManager.CLIENT_CONFIGS)) {
       const clientType = type as ClientType;
       const clientInfo = await this.detectClient(clientType);
       clients.push(clientInfo);

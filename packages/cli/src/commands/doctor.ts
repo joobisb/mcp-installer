@@ -18,7 +18,7 @@ export async function doctorCommand(options: DoctorOptions): Promise<void> {
 
     let hasIssues = false;
 
-    console.log(chalk.cyan('\\n🔍 MCP Installer System Diagnostics\\n'));
+    console.log(chalk.cyan('\n🔍 MCP Installer System Diagnostics\n'));
 
     // Check Node.js version
     spinner.text = 'Checking Node.js version...';
@@ -49,7 +49,7 @@ export async function doctorCommand(options: DoctorOptions): Promise<void> {
       await serverRegistry.loadRegistry();
       const stats = await serverRegistry.getServerStats();
       console.log(chalk.green('✓ Server registry:'), `${stats.total} servers loaded`);
-    } catch (error) {
+    } catch (error: unknown) {
       console.log(chalk.red('✗ Server registry:'), error instanceof Error ? error.message : 'Unknown error');
       hasIssues = true;
     }
@@ -69,7 +69,7 @@ export async function doctorCommand(options: DoctorOptions): Promise<void> {
       targetClients = allClients.filter(c => c.type === clientType);
     }
 
-    console.log(chalk.cyan('\\nAI Client Status:'));
+    console.log(chalk.cyan('\nAI Client Status:'));
     
     for (const client of targetClients) {
       const displayName = getClientDisplayName(client.type);
@@ -114,7 +114,7 @@ export async function doctorCommand(options: DoctorOptions): Promise<void> {
                 console.log(chalk.dim('  📦 No MCP servers installed'));
               }
               
-            } catch (error) {
+            } catch (error: unknown) {
               console.log(chalk.red('  ✗ Failed to validate config:'), error instanceof Error ? error.message : 'Unknown error');
               hasIssues = true;
             }
@@ -132,7 +132,7 @@ export async function doctorCommand(options: DoctorOptions): Promise<void> {
     }
 
     // Environment checks
-    console.log(chalk.cyan('\\nEnvironment:'));
+    console.log(chalk.cyan('\nEnvironment:'));
     console.log(chalk.green('✓ Platform:'), process.platform);
     console.log(chalk.green('✓ Architecture:'), process.arch);
     console.log(chalk.green('✓ Home directory:'), process.env.HOME || process.env.USERPROFILE || 'Unknown');
@@ -140,7 +140,7 @@ export async function doctorCommand(options: DoctorOptions): Promise<void> {
     // Summary
     spinner.succeed(chalk.green('Diagnostics completed'));
     
-    console.log(chalk.cyan('\\n📋 Summary:'));
+    console.log(chalk.cyan('\n📋 Summary:'));
     if (hasIssues) {
       console.log(chalk.red('✗ Issues detected that may affect functionality'));
       console.log(chalk.yellow('Please address the errors above before proceeding'));
@@ -150,15 +150,15 @@ export async function doctorCommand(options: DoctorOptions): Promise<void> {
     
     const installedClientCount = allClients.filter(c => c.isInstalled).length;
     if (installedClientCount === 0) {
-      console.log(chalk.yellow('\\n💡 No AI clients detected. Please install one of the supported clients:'));
+      console.log(chalk.yellow('\n💡 No AI clients detected. Please install one of the supported clients:'));
       console.log(chalk.white('  • Claude Desktop'));
       console.log(chalk.white('  • Cursor'));
       console.log(chalk.white('  • Gemini'));
     } else {
-      console.log(chalk.green(`\\n✓ ${installedClientCount} AI client(s) ready for MCP server installation`));
+      console.log(chalk.green(`\n✓ ${installedClientCount} AI client(s) ready for MCP server installation`));
     }
 
-  } catch (error) {
+  } catch (error: unknown) {
     spinner.fail(chalk.red('Diagnostics failed'));
     console.error(chalk.red(error instanceof Error ? error.message : 'Unknown error'));
     process.exit(1);

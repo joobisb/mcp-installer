@@ -56,12 +56,12 @@ jobs:
           echo "🔍 Testing workspace dependency resolution..."
           cd packages/cli
           echo "Workspace dependency before build:"
-          node -p "require('./package.json').dependencies['@mcp-installer/shared']"
+          node -p "JSON.parse(require('fs').readFileSync('./package.json', 'utf8')).dependencies['@mcp-installer/shared']"
           
-          # Test that shared package types are available
-          node -e "
+          # Test that shared package types are available using ES module import
+          node --input-type=module -e "
             try {
-              require('@mcp-installer/shared');
+              await import('@mcp-installer/shared');
               console.log('✅ Shared package imports correctly');
             } catch (e) {
               console.log('❌ Shared package import failed:', e.message);

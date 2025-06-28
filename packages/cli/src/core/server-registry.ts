@@ -34,8 +34,8 @@ export class ServerRegistry {
       // Fallback if import.meta is not available
     }
     
-    // Ultimate fallback
-    return join(process.cwd(), 'registry', 'servers.json');
+    // Ultimate fallback - assume we're in packages/cli
+    return join(process.cwd(), '..', 'registry', 'servers.json');
   }
 
   async loadRegistry(): Promise<void> {
@@ -86,7 +86,7 @@ export class ServerRegistry {
     return allServers.filter(server => 
       server.name.toLowerCase().includes(lowerQuery) ||
       server.description.toLowerCase().includes(lowerQuery) ||
-      server.tags?.some(tag => tag.toLowerCase().includes(lowerQuery))
+      server.tags?.some((tag: string) => tag.toLowerCase().includes(lowerQuery))
     );
   }
 
@@ -120,7 +120,7 @@ export class ServerRegistry {
     }
 
     if (server.installation.env) {
-      for (const [key, value] of Object.entries(server.installation.env)) {
+      for (const value of Object.values(server.installation.env)) {
         if (value.includes('${') && value.includes('}')) {
           const envVar = value.match(/\$\{([^}]+)\}/)?.[1];
           if (envVar && !process.env[envVar]) {

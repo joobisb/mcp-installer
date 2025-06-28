@@ -48,7 +48,7 @@ export async function listCommand(options: ListOptions): Promise<void> {
             console.log(`    ${difficultyColor(server.difficulty)} • ${server.type} • ${chalk.dim(server.installation.command)}`);
             
             if (server.tags && server.tags.length > 0) {
-              console.log(`    Tags: ${server.tags.map(tag => chalk.blue(tag)).join(', ')}`);
+              console.log(`    Tags: ${server.tags.map((tag: string) => chalk.blue(tag)).join(', ')}`);
             }
           });
         }
