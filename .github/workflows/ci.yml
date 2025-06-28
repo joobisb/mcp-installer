@@ -31,14 +31,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Build all packages
+        run: pnpm -r run build
+
       - name: Type check
         run: pnpm -r run typecheck
 
       - name: Lint
         run: pnpm -r run lint
-
-      - name: Build all packages
-        run: pnpm -r run build
 
       - name: Test CLI functionality
         run: |

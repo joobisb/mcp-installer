@@ -12,7 +12,8 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "declaration": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "composite": true
   },
   "include": ["src/**/*"],
   "exclude": ["dist", "node_modules"]

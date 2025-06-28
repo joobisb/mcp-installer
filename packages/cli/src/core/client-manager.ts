@@ -1,7 +1,7 @@
 import { homedir } from 'os';
 import { join } from 'path';
 import { existsSync } from 'fs';
-import { ClientType, ClientInfo } from '@mcp-installer/shared';
+import { ClientInfo, ClientType } from '@mcp-installer/shared';
 
 export class ClientManager {
   private static readonly CLIENT_CONFIGS: Record<ClientType, {

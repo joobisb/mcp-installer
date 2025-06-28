@@ -89,7 +89,7 @@ export async function doctorCommand(options: DoctorOptions): Promise<void> {
                 console.log(chalk.green('  ✓ Config is valid'));
               } else {
                 console.log(chalk.red('  ✗ Config has errors:'));
-                validation.errors.forEach(error => {
+                validation.errors.forEach((error: unknown) => {
                   console.log(chalk.red(`    • ${error}`));
                 });
                 hasIssues = true;
@@ -97,7 +97,7 @@ export async function doctorCommand(options: DoctorOptions): Promise<void> {
               
               if (validation.warnings.length > 0) {
                 console.log(chalk.yellow('  ⚠ Config warnings:'));
-                validation.warnings.forEach(warning => {
+                validation.warnings.forEach((warning: unknown) => {
                   console.log(chalk.yellow(`    • ${warning}`));
                 });
               }

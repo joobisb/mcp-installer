@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import ora from 'ora';
 import inquirer from 'inquirer';
 import { ClientManager, ConfigEngine } from '../core/index.js';
-import { ClientType, InstallationResult, getClientDisplayName } from '@mcp-installer/shared';
+import { ClientType, getClientDisplayName, InstallationResult } from '@mcp-installer/shared';
 
 interface UninstallOptions {
   clients: string;
