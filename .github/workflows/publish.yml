@@ -19,11 +19,6 @@ on:
         default: false
         type: boolean
 
-  # Automatic trigger on version tags
-  push:
-    tags:
-      - 'v*'
-
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -180,10 +175,3 @@ jobs:
             - [npm: @mcp-installer/shared](https://www.npmjs.com/package/@mcp-installer/shared)
           draft: false
           prerelease: false
-
-      - name: Push version tag
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run != 'true'
-        run: |
-          git tag v${{ env.NEW_VERSION }}
-          git push origin v${{ env.NEW_VERSION }}
-          git push origin main
