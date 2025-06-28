@@ -1,9 +1,17 @@
 {
   "name": "@mcp-installer/cli",
-  "version": "0.3.0",
+  "version": "0.3.2",
   "type": "module",
   "description": "CLI tool for installing MCP servers across AI clients",
-  "keywords": ["mcp", "model-context-protocol", "ai", "claude", "cursor", "installer", "cli"],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "ai",
+    "claude",
+    "cursor",
+    "installer",
+    "cli"
+  ],
   "bin": {
     "mcp-installer": "./dist/index.js"
   },
