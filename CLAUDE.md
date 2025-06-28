@@ -15,7 +15,7 @@ The **MCP Installer** is a comprehensive platform designed to solve the complexi
 ### The Core Challenge
 Web applications cannot directly access local files due to browser security sandbox. Our solution bridges this gap through a phased approach:
 
-1. **Phase 1**: CLI Companion Tool (`mcp-installer`)
+1. **Phase 1**: CLI Companion Tool (`@mcp-installer/cli`)
 2. **Phase 2**: Web Marketplace with copy-paste commands  
 3. **Phase 3**: Desktop Agent with custom protocol handlers
 

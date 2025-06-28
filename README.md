@@ -9,7 +9,7 @@ MCP Installer is a command-line tool that simplifies the installation and manage
 ### Installation
 
 ```bash
-npm install -g mcp-installer
+npm install -g @mcp-installer/cli
 ```
 
 ### Basic Usage

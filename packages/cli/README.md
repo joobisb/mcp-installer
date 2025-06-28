@@ -5,7 +5,7 @@ The command-line tool for installing and managing MCP servers across AI clients.
 ## Installation
 
 ```bash
-npm install -g mcp-installer
+npm install -g @mcp-installer/cli
 ```
 
 ## Usage

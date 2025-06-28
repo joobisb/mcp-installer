@@ -1,6 +1,6 @@
 {
-  "name": "mcp-installer",
-  "version": "0.1.0",
+  "name": "@mcp-installer/cli",
+  "version": "0.3.0",
   "type": "module",
   "description": "CLI tool for installing MCP servers across AI clients",
   "keywords": ["mcp", "model-context-protocol", "ai", "claude", "cursor", "installer", "cli"],
@@ -13,6 +13,9 @@
     "dist/**/*",
     "README.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
@@ -46,7 +49,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/username/mcp-installer.git",
+    "url": "https://github.com/joobisb/mcp-installer.git",
     "directory": "packages/cli"
   },
   "license": "MIT"

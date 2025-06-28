@@ -27,6 +27,8 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     
     steps:
       - name: Checkout code
@@ -98,7 +100,7 @@ jobs:
           echo "🧪 DRY RUN MODE - No packages will be published"
           echo "Would publish:"
           echo "  📦 @mcp-installer/shared@${{ env.NEW_VERSION || 'current' }}"
-          echo "  🖥️ mcp-installer@${{ env.NEW_VERSION || 'current' }}"
+          echo "  🖥️ @mcp-installer/cli@${{ env.NEW_VERSION || 'current' }}"
           
           # Test publish commands without actually publishing
           cd packages/shared
@@ -127,7 +129,7 @@ jobs:
       - name: Publish CLI package
         if: github.event.inputs.dry_run != 'true'
         run: |
-          echo "🖥️ Publishing mcp-installer..."
+          echo "🖥️ Publishing @mcp-installer/cli..."
           cd packages/cli
           echo "Final CLI dependencies before publish:"
           node -p "require('./package.json').dependencies['@mcp-installer/shared']"
@@ -145,11 +147,11 @@ jobs:
           echo "📦 @mcp-installer/shared@$SHARED_VERSION published successfully"
           
           # Check CLI package  
-          CLI_VERSION=$(npm view mcp-installer version)
-          echo "🖥️ mcp-installer@$CLI_VERSION published successfully"
+          CLI_VERSION=$(npm view @mcp-installer/cli version)
+          echo "🖥️ @mcp-installer/cli@$CLI_VERSION published successfully"
           
           # Verify CLI package dependencies
-          CLI_DEPS=$(npm view mcp-installer dependencies --json)
+          CLI_DEPS=$(npm view @mcp-installer/cli dependencies --json)
           echo "🔗 CLI package dependencies:"
           echo "$CLI_DEPS" | jq -r '.["@mcp-installer/shared"]' || echo "Could not verify dependency"
 
@@ -166,15 +168,15 @@ jobs:
             
             ### 📦 Published Packages
             - `@mcp-installer/shared@${{ env.NEW_VERSION }}`
-            - `mcp-installer@${{ env.NEW_VERSION }}`
+            - `@mcp-installer/cli@${{ env.NEW_VERSION }}`
             
             ### 📥 Installation
             ```bash
-            npm install -g mcp-installer@${{ env.NEW_VERSION }}
+            npm install -g @mcp-installer/cli@${{ env.NEW_VERSION }}
             ```
             
             ### 🔗 Links
-            - [npm: mcp-installer](https://www.npmjs.com/package/mcp-installer)
+            - [npm: @mcp-installer/cli](https://www.npmjs.com/package/@mcp-installer/cli)
             - [npm: @mcp-installer/shared](https://www.npmjs.com/package/@mcp-installer/shared)
           draft: false
           prerelease: false
