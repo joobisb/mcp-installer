@@ -1,0 +1,37 @@
+{
+  "name": "mcp-installer",
+  "version": "0.1.0",
+  "description": "One-click MCP server installation across AI clients",
+  "keywords": ["mcp", "model-context-protocol", "ai", "claude", "cursor", "installer"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joobisb/mcp-installer.git"
+  },
+  "license": "MIT",
+  "private": true,
+  "packageManager": "pnpm@8.0.0",
+  "scripts": {
+    "dev": "pnpm --filter=packages/webapp run dev",
+    "build": "pnpm -r run build",
+    "test": "pnpm -r run test",
+    "lint": "pnpm -r run lint",
+    "typecheck": "pnpm -r run typecheck",
+    "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist",
+    "cli:dev": "pnpm --filter=packages/cli run dev",
+    "cli:build": "pnpm --filter=packages/cli run build",
+    "webapp:dev": "pnpm --filter=packages/webapp run dev",
+    "webapp:build": "pnpm --filter=packages/webapp run build"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0",
+    "prettier": "^3.1.0",
+    "eslint": "^8.56.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

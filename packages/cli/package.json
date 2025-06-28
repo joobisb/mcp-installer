@@ -1,0 +1,53 @@
+{
+  "name": "mcp-installer",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "CLI tool for installing MCP servers across AI clients",
+  "keywords": ["mcp", "model-context-protocol", "ai", "claude", "cursor", "installer", "cli"],
+  "bin": {
+    "mcp-installer": "./dist/index.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/**/*.ts",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "dependencies": {
+    "@mcp-installer/shared": "workspace:*",
+    "commander": "^11.1.0",
+    "fs-extra": "^11.2.0",
+    "chalk": "^5.3.0",
+    "ora": "^8.0.1",
+    "inquirer": "^9.2.12"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/inquirer": "^9.0.7",
+    "@types/jest": "^29.5.8",
+    "jest": "^29.7.0",
+    "memfs": "^4.6.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/username/mcp-installer.git",
+    "directory": "packages/cli"
+  },
+  "license": "MIT"
+}

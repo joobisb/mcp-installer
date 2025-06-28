@@ -138,7 +138,7 @@ mcp-installer restore <backup-path> [options]
 ## 🔧 Requirements
 
 - **Node.js** >= 18.0.0
-- **npm** >= 9.0.0
+- **pnpm** >= 8.0.0 (recommended) or **npm** >= 9.0.0
 - At least one supported AI client installed
 
 ## 🛠️ Development
@@ -147,10 +147,14 @@ For local development, testing, and debugging instructions, see [DEVELOPMENT.md]
 
 ### Quick Start
 ```bash
+# Install pnpm globally if needed
+npm install -g pnpm
+
+# Clone and setup
 git clone <repository-url>
 cd mcp-installer
-npm install
-npm run build
+pnpm install
+pnpm run build
 ```
 
 ### Testing
@@ -162,7 +166,7 @@ node dist/index.js list --available
 node dist/index.js doctor
 
 # Run test suite
-npm test
+pnpm test
 ```
 
 For detailed development workflows, debugging tips, and contribution guidelines, see the [Development Guide](DEVELOPMENT.md).

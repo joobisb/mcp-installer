@@ -1,0 +1,104 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "servers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9-_]+$",
+            "description": "Unique identifier for the server"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Human-readable name"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Brief description of server functionality"
+          },
+          "category": {
+            "type": "string",
+            "enum": ["development", "productivity", "database", "web", "ai", "utility"]
+          },
+          "type": {
+            "type": "string",
+            "enum": ["stdio", "http"]
+          },
+          "difficulty": {
+            "type": "string",
+            "enum": ["simple", "medium", "advanced"]
+          },
+          "requiresAuth": {
+            "type": "boolean"
+          },
+          "installation": {
+            "type": "object",
+            "properties": {
+              "command": {
+                "type": "string",
+                "minLength": 1
+              },
+              "args": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "env": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": ["command", "args"],
+            "additionalProperties": false
+          },
+          "documentation": {
+            "type": "string",
+            "format": "uri"
+          },
+          "repository": {
+            "type": "string",
+            "format": "uri"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "version": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "validatedOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Date when server was last manually validated"
+          }
+        },
+        "required": ["id", "name", "description", "category", "type", "difficulty", "requiresAuth", "installation", "documentation"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["version", "lastUpdated", "servers"],
+  "additionalProperties": false
+}

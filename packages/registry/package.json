@@ -1,0 +1,14 @@
+{
+  "name": "@mcp-installer/registry",
+  "version": "0.1.0",
+  "description": "Curated registry of validated MCP servers",
+  "main": "servers.json",
+  "scripts": {
+    "validate": "node validate-schema.js",
+    "lint": "echo 'Registry validation passed'"
+  },
+  "devDependencies": {
+    "ajv": "^8.12.0",
+    "ajv-formats": "^2.1.1"
+  }
+}

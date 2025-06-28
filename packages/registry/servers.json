@@ -1,0 +1,99 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2024-12-28T00:00:00Z",
+  "servers": [
+    {
+      "id": "playwright",
+      "name": "Playwright",
+      "description": "Browser automation and testing capabilities for web scraping and testing",
+      "category": "development",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": false,
+      "installation": {
+        "command": "npx",
+        "args": ["@playwright/mcp@latest"]
+      },
+      "documentation": "https://github.com/microsoft/playwright-mcp",
+      "repository": "https://github.com/microsoft/playwright-mcp",
+      "tags": ["browser", "automation", "testing", "scraping"],
+      "author": "Microsoft",
+      "validatedOn": "2024-12-28"
+    },
+    {
+      "id": "filesystem",
+      "name": "Filesystem",
+      "description": "Secure local file system access with configurable directory permissions",
+      "category": "utility",
+      "type": "stdio", 
+      "difficulty": "simple",
+      "requiresAuth": false,
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-filesystem", "/Users/user/Desktop", "/Users/user/Downloads"]
+      },
+      "documentation": "https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem",
+      "repository": "https://github.com/modelcontextprotocol/servers",
+      "tags": ["files", "filesystem", "local"],
+      "author": "MCP Team",
+      "validatedOn": "2024-12-28"
+    },
+    {
+      "id": "sqlite",
+      "name": "SQLite",
+      "description": "Query and manage SQLite databases with full SQL support",
+      "category": "database",
+      "type": "stdio",
+      "difficulty": "simple", 
+      "requiresAuth": false,
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-sqlite", "/path/to/database.db"]
+      },
+      "documentation": "https://github.com/modelcontextprotocol/servers/tree/main/src/sqlite",
+      "repository": "https://github.com/modelcontextprotocol/servers",
+      "tags": ["database", "sql", "sqlite"],
+      "author": "MCP Team",
+      "validatedOn": "2024-12-28"
+    },
+    {
+      "id": "github",
+      "name": "GitHub",
+      "description": "Interact with GitHub repositories, issues, and pull requests",
+      "category": "development",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-github"]
+      },
+      "documentation": "https://github.com/modelcontextprotocol/servers/tree/main/src/github",
+      "repository": "https://github.com/modelcontextprotocol/servers",
+      "tags": ["github", "git", "version-control", "repositories"],
+      "author": "MCP Team",
+      "validatedOn": "2024-12-28"
+    },
+    {
+      "id": "brave-search",
+      "name": "Brave Search",
+      "description": "Web search capabilities using Brave Search API",
+      "category": "web",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+        "env": {
+          "BRAVE_API_KEY": "${BRAVE_API_KEY}"
+        }
+      },
+      "documentation": "https://github.com/modelcontextprotocol/servers-archived/tree/main/src/brave-search",
+      "repository": "https://github.com/modelcontextprotocol/servers",
+      "tags": ["search", "web", "api"],
+      "author": "MCP Team",
+      "validatedOn": "2024-12-28"
+    }
+  ]
+}
