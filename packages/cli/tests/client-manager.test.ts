@@ -1,19 +1,12 @@
 import { vol } from 'memfs';
 import { ClientManager } from '../src/core/client-manager';
 
-jest.mock('fs', () => require('memfs').fs);
-jest.mock('fs-extra', () => require('memfs').fs);
-
 describe('ClientManager', () => {
   let clientManager: ClientManager;
 
   beforeEach(() => {
     vol.reset();
     clientManager = new ClientManager();
-  });
-
-  afterEach(() => {
-    vol.reset();
   });
 
   describe('detectInstalledClients', () => {

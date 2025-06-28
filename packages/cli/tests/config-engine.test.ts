@@ -1,9 +1,6 @@
 import { vol } from 'memfs';
 import { ConfigEngine } from '../src/core/config-engine';
 
-jest.mock('fs', () => require('memfs').fs);
-jest.mock('fs-extra', () => require('memfs').fs);
-
 describe('ConfigEngine', () => {
   let configEngine: ConfigEngine;
   const testConfigPath = '/Users/test/.cursor/mcp.json';
@@ -11,10 +8,6 @@ describe('ConfigEngine', () => {
   beforeEach(() => {
     vol.reset();
     configEngine = new ConfigEngine();
-  });
-
-  afterEach(() => {
-    vol.reset();
   });
 
   describe('readConfig', () => {
@@ -272,7 +265,9 @@ describe('ConfigEngine', () => {
       const result = await configEngine.validateConfig(testConfigPath);
       
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain(expect.stringContaining('missing required \'command\' field'));
+      expect(result.errors.some(error => 
+        error.includes('must have either \'command\' (for local servers) or \'url\' (for remote servers)')
+      )).toBe(true);
     });
 
     it('should detect invalid args type', async () => {
@@ -292,14 +287,18 @@ describe('ConfigEngine', () => {
       const result = await configEngine.validateConfig(testConfigPath);
       
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain(expect.stringContaining('args\' must be an array'));
+      expect(result.errors.some(error => 
+        error.includes('args\' must be an array')
+      )).toBe(true);
     });
 
     it('should warn when config file does not exist', async () => {
       const result = await configEngine.validateConfig('/non/existent/path');
       
       expect(result.isValid).toBe(true);
-      expect(result.warnings).toContain(expect.stringContaining('Config file does not exist'));
+      expect(result.warnings.some(warning => 
+        warning.includes('Config file does not exist')
+      )).toBe(true);
     });
   });
 });

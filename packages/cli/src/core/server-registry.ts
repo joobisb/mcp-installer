@@ -1,8 +1,6 @@
 import fsExtra from 'fs-extra';
 const { readFile } = fsExtra;
 import { join } from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 import { MCPServer, ServerRegistry as ServerRegistryType, ValidationResult } from '@mcp-installer/shared';
 
 export class ServerRegistry {
@@ -14,9 +12,30 @@ export class ServerRegistry {
   }
 
   private getDefaultRegistryPath(): string {
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = dirname(__filename);
-    return join(__dirname, '..', '..', '..', 'registry', 'servers.json');
+    // In test environment, use a simple fallback
+    if (process.env.NODE_ENV === 'test' || typeof jest !== 'undefined') {
+      return join(process.cwd(), 'registry', 'servers.json');
+    }
+    
+    // In production, use import.meta for proper path resolution
+    try {
+      // Dynamic import to avoid parsing issues
+      const { fileURLToPath } = require('url');
+      const { dirname } = require('path');
+      
+      // Use eval to avoid Jest parsing import.meta
+      const importMeta = eval('import.meta');
+      if (importMeta && importMeta.url) {
+        const __filename = fileURLToPath(importMeta.url);
+        const __dirname = dirname(__filename);
+        return join(__dirname, '..', '..', '..', 'registry', 'servers.json');
+      }
+    } catch (error) {
+      // Fallback if import.meta is not available
+    }
+    
+    // Ultimate fallback
+    return join(process.cwd(), 'registry', 'servers.json');
   }
 
   async loadRegistry(): Promise<void> {
