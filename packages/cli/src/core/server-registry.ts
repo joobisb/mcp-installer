@@ -1,7 +1,12 @@
 import fsExtra from 'fs-extra';
 const { readFile } = fsExtra;
 import { join } from 'path';
-import { MCPServer, ServerRegistry as ServerRegistryType, ValidationResult } from '@mcp-installer/shared';
+import { existsSync } from 'fs';
+import {
+  MCPServer,
+  ServerRegistry as ServerRegistryType,
+  ValidationResult,
+} from '@mcp-installer/shared';
 
 export class ServerRegistry {
   private servers: MCPServer[] = [];
@@ -16,40 +21,82 @@ export class ServerRegistry {
     if (process.env.NODE_ENV === 'test' || typeof jest !== 'undefined') {
       return join(process.cwd(), 'registry', 'servers.json');
     }
-    
-    // In production, use import.meta for proper path resolution
+
+    // For development (monorepo), use relative path to registry package
+    return join(process.cwd(), '..', 'registry', 'servers.json');
+  }
+
+  private async tryLoadEmbeddedRegistry(): Promise<ServerRegistryType | null> {
     try {
-      // Dynamic import to avoid parsing issues
+      // Try to load embedded registry (only available in published package)
       const { fileURLToPath } = require('url');
       const { dirname } = require('path');
-      
-      // Use eval to avoid Jest parsing import.meta
+
+      // Get path relative to the built file
       const importMeta = eval('import.meta');
       if (importMeta && importMeta.url) {
         const __filename = fileURLToPath(importMeta.url);
         const __dirname = dirname(__filename);
-        return join(__dirname, '..', '..', '..', 'registry', 'servers.json');
+        const embeddedPath = join(__dirname, '..', 'registry-data.json');
+
+        if (existsSync(embeddedPath)) {
+          const content = await readFile(embeddedPath, 'utf-8');
+          return JSON.parse(content);
+        }
       }
-    } catch (error) {
-      // Fallback if import.meta is not available
+
+      // Alternative: try package root (for npm package)
+      const packageRoot = join(__dirname, '..', '..');
+      const rootEmbeddedPath = join(packageRoot, 'registry-data.json');
+
+      if (existsSync(rootEmbeddedPath)) {
+        const content = await readFile(rootEmbeddedPath, 'utf-8');
+        return JSON.parse(content);
+      }
+
+      return null;
+    } catch {
+      return null;
     }
-    
-    // Ultimate fallback - assume we're in packages/cli
-    return join(process.cwd(), '..', 'registry', 'servers.json');
   }
 
   async loadRegistry(): Promise<void> {
+    let registry: ServerRegistryType;
+
+    // Strategy 1: Try embedded registry first (npm package)
+    try {
+      const embeddedRegistry = await this.tryLoadEmbeddedRegistry();
+      if (embeddedRegistry) {
+        registry = embeddedRegistry;
+
+        if (!registry.servers || !Array.isArray(registry.servers)) {
+          throw new Error('Invalid embedded registry format: missing or invalid servers array');
+        }
+
+        this.servers = registry.servers;
+        return;
+      }
+    } catch (error) {
+      console.warn(
+        'Failed to load embedded registry, trying file...',
+        error instanceof Error ? error.message : 'Unknown error'
+      );
+    }
+
+    // Strategy 2: Fall back to file-based loading (development)
     try {
       const content = await readFile(this.registryPath, 'utf-8');
-      const registry: ServerRegistryType = JSON.parse(content);
-      
+      registry = JSON.parse(content);
+
       if (!registry.servers || !Array.isArray(registry.servers)) {
         throw new Error('Invalid registry format: missing or invalid servers array');
       }
 
       this.servers = registry.servers;
     } catch (error) {
-      throw new Error(`Failed to load server registry: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to load server registry: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -58,7 +105,7 @@ export class ServerRegistry {
       await this.loadRegistry();
     }
 
-    return this.servers.find(server => server.id === serverId) || null;
+    return this.servers.find((server) => server.id === serverId) || null;
   }
 
   async getAllServers(): Promise<MCPServer[]> {
@@ -71,22 +118,23 @@ export class ServerRegistry {
 
   async getServersByCategory(category: MCPServer['category']): Promise<MCPServer[]> {
     const allServers = await this.getAllServers();
-    return allServers.filter(server => server.category === category);
+    return allServers.filter((server) => server.category === category);
   }
 
   async getServersByDifficulty(difficulty: MCPServer['difficulty']): Promise<MCPServer[]> {
     const allServers = await this.getAllServers();
-    return allServers.filter(server => server.difficulty === difficulty);
+    return allServers.filter((server) => server.difficulty === difficulty);
   }
 
   async searchServers(query: string): Promise<MCPServer[]> {
     const allServers = await this.getAllServers();
     const lowerQuery = query.toLowerCase();
 
-    return allServers.filter(server => 
-      server.name.toLowerCase().includes(lowerQuery) ||
-      server.description.toLowerCase().includes(lowerQuery) ||
-      server.tags?.some((tag: string) => tag.toLowerCase().includes(lowerQuery))
+    return allServers.filter(
+      (server) =>
+        server.name.toLowerCase().includes(lowerQuery) ||
+        server.description.toLowerCase().includes(lowerQuery) ||
+        server.tags?.some((tag: string) => tag.toLowerCase().includes(lowerQuery))
     );
   }
 
@@ -98,7 +146,7 @@ export class ServerRegistry {
     };
 
     const server = await this.getServer(serverId);
-    
+
     if (!server) {
       result.isValid = false;
       result.errors.push(`Server '${serverId}' not found in registry`);
@@ -116,7 +164,9 @@ export class ServerRegistry {
     }
 
     if (server.requiresAuth && !server.installation.env) {
-      result.warnings.push(`Server '${serverId}' requires authentication but no environment variables specified`);
+      result.warnings.push(
+        `Server '${serverId}' requires authentication but no environment variables specified`
+      );
     }
 
     if (server.installation.env) {
@@ -124,7 +174,9 @@ export class ServerRegistry {
         if (value.includes('${') && value.includes('}')) {
           const envVar = value.match(/\$\{([^}]+)\}/)?.[1];
           if (envVar && !process.env[envVar]) {
-            result.warnings.push(`Environment variable '${envVar}' not set for server '${serverId}'`);
+            result.warnings.push(
+              `Environment variable '${envVar}' not set for server '${serverId}'`
+            );
           }
         }
       }
@@ -135,7 +187,7 @@ export class ServerRegistry {
 
   async getCategories(): Promise<MCPServer['category'][]> {
     const allServers = await this.getAllServers();
-    const categories = new Set(allServers.map(server => server.category));
+    const categories = new Set(allServers.map((server) => server.category));
     return Array.from(categories);
   }
 
@@ -146,7 +198,7 @@ export class ServerRegistry {
     requiresAuth: number;
   }> {
     const allServers = await this.getAllServers();
-    
+
     const byCategory: Record<string, number> = {};
     const byDifficulty: Record<string, number> = {};
     let requiresAuth = 0;

@@ -2,6 +2,9 @@
 
 import { Command } from 'commander';
 import chalk from 'chalk';
+import { readFileSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 import { installCommand } from './commands/install.js';
 import { uninstallCommand } from './commands/uninstall.js';
 import { listCommand } from './commands/list.js';
@@ -9,12 +12,18 @@ import { doctorCommand } from './commands/doctor.js';
 import { backupCommand } from './commands/backup.js';
 import { restoreCommand } from './commands/restore.js';
 
+// Get version from package.json dynamically
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const packagePath = join(__dirname, '..', 'package.json');
+const packageJson = JSON.parse(readFileSync(packagePath, 'utf-8'));
+
 const program = new Command();
 
 program
   .name('mcp-installer')
   .description('One-click MCP server installation across AI clients')
-  .version('0.1.0');
+  .version(packageJson.version);
 
 program
   .command('install')

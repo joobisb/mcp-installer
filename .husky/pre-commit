@@ -1,0 +1,21 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Install dependencies
+echo "Installing dependencies..."
+pnpm install
+
+# Build all packages
+echo "Building all packages..."
+pnpm -r run build
+
+# Type check all packages
+echo "Type checking all packages..."
+pnpm -r run typecheck
+
+# Lint all packages
+echo "Linting all packages..."
+pnpm -r run lint
+
+# Run lint-staged for file-specific linting and formatting
+npx lint-staged
