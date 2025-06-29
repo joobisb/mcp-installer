@@ -19,7 +19,6 @@
   "types": "dist/index.d.ts",
   "files": [
     "dist/**/*",
-    "servers.json",
     "README.md"
   ],
   "publishConfig": {
@@ -29,13 +28,12 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "start": "node dist/index.js",
-    "clean": "rm -rf dist servers.json",
+    "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/**/*.ts",
     "test": "jest",
     "test:watch": "jest --watch",
-    "prepublishOnly": "pnpm run clean && pnpm run build && cp ../registry/servers.json ./servers.json",
-    "postpublish": "rm -f ./servers.json"
+    "prepublishOnly": "pnpm run clean && pnpm run build"
   },
   "dependencies": {
     "@mcp-installer/shared": "workspace:*",

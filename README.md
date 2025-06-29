@@ -93,6 +93,34 @@ mcp-installer list --installed
 mcp-installer list --installed --client=cursor
 ```
 
+git
+
+### Update Registry
+
+```bash
+mcp-installer update [options]
+```
+
+**Options:**
+
+- `--clear-cache` - Clear the registry cache before updating
+- `--show-cache` - Show information about the registry cache
+
+**Examples:**
+
+```bash
+# Update server registry from remote source
+mcp-installer update
+
+# Clear cache and force fresh download
+mcp-installer update --clear-cache
+
+# Show cache information
+mcp-installer update --show-cache
+```
+
+The update command fetches the latest server registry from the remote source, ensuring you have access to the newest MCP servers without updating the CLI tool itself.
+
 ### System Diagnostics
 
 ```bash

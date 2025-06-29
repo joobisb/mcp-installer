@@ -1,6 +1,10 @@
 import { vol } from 'memfs';
 import { ServerRegistry } from '../src/core/server-registry';
 
+// Mock fetch globally
+const mockFetch = jest.fn();
+global.fetch = mockFetch;
+
 describe('ServerRegistry', () => {
   let serverRegistry: ServerRegistry;
   const testRegistryPath = '/test/registry/servers.json';
@@ -65,7 +69,15 @@ describe('ServerRegistry', () => {
     vol.fromJSON({
       [testRegistryPath]: JSON.stringify(mockRegistry),
     });
-    serverRegistry = new ServerRegistry(testRegistryPath);
+    serverRegistry = new ServerRegistry({ customRegistryPath: testRegistryPath });
+
+    // Reset mock
+    mockFetch.mockReset();
+  });
+
+  afterEach(() => {
+    // Clean up console.log mocks to reduce noise
+    jest.clearAllMocks();
   });
 
   describe('loadRegistry', () => {
@@ -74,27 +86,53 @@ describe('ServerRegistry', () => {
       expect(serverRegistry.isLoaded()).toBe(true);
     });
 
-    it('should throw error for invalid registry format', async () => {
+    it('should throw error for invalid registry format when remote also fails', async () => {
       vol.fromJSON({
         [testRegistryPath]: JSON.stringify({ invalid: 'format' }),
       });
 
-      await expect(serverRegistry.loadRegistry()).rejects.toThrow(
-        'Invalid registry format: missing or invalid servers array'
-      );
-    });
-
-    it('should throw error for invalid JSON', async () => {
-      vol.fromJSON({
-        [testRegistryPath]: 'invalid json',
-      });
+      // Mock fetch to fail so it doesn't fallback to remote
+      mockFetch.mockRejectedValue(new Error('Network error'));
 
       await expect(serverRegistry.loadRegistry()).rejects.toThrow();
     });
 
-    it('should throw error when file does not exist', async () => {
-      const nonExistentRegistry = new ServerRegistry('/non/existent/path');
+    it('should throw error for invalid JSON when remote also fails', async () => {
+      vol.fromJSON({
+        [testRegistryPath]: 'invalid json',
+      });
+
+      // Mock fetch to fail so it doesn't fallback to remote
+      mockFetch.mockRejectedValue(new Error('Network error'));
+
+      await expect(serverRegistry.loadRegistry()).rejects.toThrow();
+    });
+
+    it('should throw error when file does not exist and remote fails', async () => {
+      const nonExistentRegistry = new ServerRegistry({ customRegistryPath: '/non/existent/path' });
+
+      // Mock fetch to fail so it doesn't fallback to remote
+      mockFetch.mockRejectedValue(new Error('Network error'));
+
       await expect(nonExistentRegistry.loadRegistry()).rejects.toThrow();
+    });
+
+    it('should fallback to remote when local file is invalid', async () => {
+      vol.fromJSON({
+        [testRegistryPath]: JSON.stringify({ invalid: 'format' }),
+      });
+
+      // Mock successful remote fetch
+      mockFetch.mockResolvedValue({
+        ok: true,
+        status: 200,
+        text: () => Promise.resolve(JSON.stringify(mockRegistry)),
+        headers: new Map(),
+      } as any);
+
+      await serverRegistry.loadRegistry();
+      expect(serverRegistry.isLoaded()).toBe(true);
+      expect(mockFetch).toHaveBeenCalled();
     });
   });
 

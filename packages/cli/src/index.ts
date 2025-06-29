@@ -11,6 +11,7 @@ import { listCommand } from './commands/list.js';
 import { doctorCommand } from './commands/doctor.js';
 import { backupCommand } from './commands/backup.js';
 import { restoreCommand } from './commands/restore.js';
+import { updateCommand } from './commands/update.js';
 
 // Get version from package.json dynamically
 const __filename = fileURLToPath(import.meta.url);
@@ -72,6 +73,13 @@ program
   .option('-c, --client <client>', 'Restore specific client only')
   .option('-f, --force', 'Force restoration without confirmation')
   .action(restoreCommand);
+
+program
+  .command('update')
+  .description('Update server registry from remote source')
+  .option('--clear-cache', 'Clear the registry cache before updating')
+  .option('--show-cache', 'Show information about the registry cache')
+  .action(updateCommand);
 
 program.on('command:*', () => {
   console.error(chalk.red(`Invalid command: ${program.args.join(' ')}`));
