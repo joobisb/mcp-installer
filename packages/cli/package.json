@@ -34,7 +34,7 @@
     "lint": "eslint src/**/*.ts",
     "test": "jest",
     "test:watch": "jest --watch",
-    "prepublishOnly": "npm run clean && npm run build && cp ../registry/servers.json ./registry-data.json",
+    "prepublishOnly": "pnpm run clean && pnpm run build && cp ../registry/servers.json ./registry-data.json",
     "postpublish": "rm -f ./registry-data.json"
   },
   "dependencies": {

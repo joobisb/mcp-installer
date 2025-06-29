@@ -17,5 +17,9 @@ pnpm -r run typecheck
 echo "Linting all packages..."
 pnpm -r run lint
 
+# run tests
+pnpm -r run test
+
+
 # Run lint-staged for file-specific linting and formatting
 npx lint-staged

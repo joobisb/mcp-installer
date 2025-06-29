@@ -16,6 +16,28 @@ export class ServerRegistry {
     this.registryPath = registryPath || this.getDefaultRegistryPath();
   }
 
+  private async isPublishedPackage(): Promise<boolean> {
+    try {
+      // In test environment, always return false (development mode)
+      if (process.env.NODE_ENV === 'test' || typeof jest !== 'undefined') {
+        return false;
+      }
+
+      // For runtime detection, we'll use a simpler approach
+      // Check if registry-data.json exists in working directory (simpler detection)
+      const workingDirPath = join(process.cwd(), 'registry-data.json');
+      if (existsSync(workingDirPath)) {
+        return true;
+      }
+
+      // Check relative to the current working directory for global installs
+      // In global npm installs, the package structure is different
+      return process.cwd().includes('node_modules');
+    } catch {
+      return false;
+    }
+  }
+
   private getDefaultRegistryPath(): string {
     // In test environment, use a simple fallback
     if (process.env.NODE_ENV === 'test' || typeof jest !== 'undefined') {
@@ -28,75 +50,104 @@ export class ServerRegistry {
 
   private async tryLoadEmbeddedRegistry(): Promise<ServerRegistryType | null> {
     try {
-      // Try to load embedded registry (only available in published package)
-      const { fileURLToPath } = require('url');
-      const { dirname } = require('path');
+      // In test environment, skip embedded registry loading
+      if (process.env.NODE_ENV === 'test' || typeof jest !== 'undefined') {
+        return null;
+      }
 
-      // Get path relative to the built file
-      const importMeta = eval('import.meta');
-      if (importMeta && importMeta.url) {
-        const __filename = fileURLToPath(importMeta.url);
-        const __dirname = dirname(__filename);
-        const embeddedPath = join(__dirname, '..', 'registry-data.json');
+      // Try multiple possible locations for the embedded registry
+      const possiblePaths = [
+        // In working directory (for published package)
+        join(process.cwd(), 'registry-data.json'),
+        // Relative to package root (alternative location)
+        join(process.cwd(), '..', 'registry-data.json'),
+        // In node_modules path structure
+        join(process.cwd(), 'node_modules', '@mcp-installer', 'cli', 'registry-data.json'),
+      ];
 
+      for (const embeddedPath of possiblePaths) {
         if (existsSync(embeddedPath)) {
+          console.log(`Loading embedded registry from: ${embeddedPath}`);
           const content = await readFile(embeddedPath, 'utf-8');
           return JSON.parse(content);
         }
       }
 
-      // Alternative: try package root (for npm package)
-      const packageRoot = join(__dirname, '..', '..');
-      const rootEmbeddedPath = join(packageRoot, 'registry-data.json');
-
-      if (existsSync(rootEmbeddedPath)) {
-        const content = await readFile(rootEmbeddedPath, 'utf-8');
-        return JSON.parse(content);
-      }
-
+      console.log(`Embedded registry not found in any expected location`);
       return null;
-    } catch {
+    } catch (error) {
+      console.log(
+        `Failed to load embedded registry:`,
+        error instanceof Error ? error.message : 'Unknown error'
+      );
       return null;
     }
   }
 
   async loadRegistry(): Promise<void> {
     let registry: ServerRegistryType;
+    const isPublished = await this.isPublishedPackage();
 
-    // Strategy 1: Try embedded registry first (npm package)
-    try {
-      const embeddedRegistry = await this.tryLoadEmbeddedRegistry();
-      if (embeddedRegistry) {
-        registry = embeddedRegistry;
+    console.log(`Loading registry in ${isPublished ? 'published' : 'development'} mode`);
+
+    if (isPublished) {
+      // Published package: Only try embedded registry
+      try {
+        const embeddedRegistry = await this.tryLoadEmbeddedRegistry();
+        if (embeddedRegistry) {
+          registry = embeddedRegistry;
+
+          if (!registry.servers || !Array.isArray(registry.servers)) {
+            throw new Error('Invalid embedded registry format: missing or invalid servers array');
+          }
+
+          this.servers = registry.servers;
+          console.log(`Successfully loaded ${this.servers.length} servers from embedded registry`);
+          return;
+        }
+
+        throw new Error('Embedded registry not found in published package');
+      } catch (error) {
+        throw new Error(
+          `Failed to load embedded registry in published package: ${error instanceof Error ? error.message : 'Unknown error'}`
+        );
+      }
+    } else {
+      // Development mode: Try embedded first, then fall back to file-based
+      try {
+        const embeddedRegistry = await this.tryLoadEmbeddedRegistry();
+        if (embeddedRegistry) {
+          registry = embeddedRegistry;
+
+          if (!registry.servers || !Array.isArray(registry.servers)) {
+            throw new Error('Invalid embedded registry format: missing or invalid servers array');
+          }
+
+          this.servers = registry.servers;
+          console.log(`Successfully loaded ${this.servers.length} servers from embedded registry`);
+          return;
+        }
+      } catch (error) {
+        console.log('Embedded registry not available, trying file-based loading...');
+      }
+
+      // Fall back to file-based loading (development)
+      try {
+        console.log(`Loading registry from file: ${this.registryPath}`);
+        const content = await readFile(this.registryPath, 'utf-8');
+        registry = JSON.parse(content);
 
         if (!registry.servers || !Array.isArray(registry.servers)) {
-          throw new Error('Invalid embedded registry format: missing or invalid servers array');
+          throw new Error('Invalid registry format: missing or invalid servers array');
         }
 
         this.servers = registry.servers;
-        return;
+        console.log(`Successfully loaded ${this.servers.length} servers from file`);
+      } catch (error) {
+        throw new Error(
+          `Failed to load server registry from file ${this.registryPath}: ${error instanceof Error ? error.message : 'Unknown error'}`
+        );
       }
-    } catch (error) {
-      console.warn(
-        'Failed to load embedded registry, trying file...',
-        error instanceof Error ? error.message : 'Unknown error'
-      );
-    }
-
-    // Strategy 2: Fall back to file-based loading (development)
-    try {
-      const content = await readFile(this.registryPath, 'utf-8');
-      registry = JSON.parse(content);
-
-      if (!registry.servers || !Array.isArray(registry.servers)) {
-        throw new Error('Invalid registry format: missing or invalid servers array');
-      }
-
-      this.servers = registry.servers;
-    } catch (error) {
-      throw new Error(
-        `Failed to load server registry: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
     }
   }
 
