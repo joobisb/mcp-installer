@@ -25,12 +25,17 @@
       "name": "Filesystem",
       "description": "Secure local file system access with configurable directory permissions",
       "category": "utility",
-      "type": "stdio", 
+      "type": "stdio",
       "difficulty": "simple",
       "requiresAuth": false,
       "installation": {
         "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-filesystem", "/Users/user/Desktop", "/Users/user/Downloads"]
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-filesystem",
+          "/Users/user/Desktop",
+          "/Users/user/Downloads"
+        ]
       },
       "documentation": "https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem",
       "repository": "https://github.com/modelcontextprotocol/servers",
@@ -44,7 +49,7 @@
       "description": "Query and manage SQLite databases with full SQL support",
       "category": "database",
       "type": "stdio",
-      "difficulty": "simple", 
+      "difficulty": "simple",
       "requiresAuth": false,
       "installation": {
         "command": "npx",
@@ -71,27 +76,6 @@
       "documentation": "https://github.com/modelcontextprotocol/servers/tree/main/src/github",
       "repository": "https://github.com/modelcontextprotocol/servers",
       "tags": ["github", "git", "version-control", "repositories"],
-      "author": "MCP Team",
-      "validatedOn": "2024-12-28"
-    },
-    {
-      "id": "brave-search",
-      "name": "Brave Search",
-      "description": "Web search capabilities using Brave Search API",
-      "category": "web",
-      "type": "stdio",
-      "difficulty": "medium",
-      "requiresAuth": true,
-      "installation": {
-        "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-brave-search"],
-        "env": {
-          "BRAVE_API_KEY": "${BRAVE_API_KEY}"
-        }
-      },
-      "documentation": "https://github.com/modelcontextprotocol/servers-archived/tree/main/src/brave-search",
-      "repository": "https://github.com/modelcontextprotocol/servers",
-      "tags": ["search", "web", "api"],
       "author": "MCP Team",
       "validatedOn": "2024-12-28"
     }

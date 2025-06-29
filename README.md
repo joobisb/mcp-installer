@@ -12,7 +12,7 @@ MCP Installer is a command-line tool that simplifies the installation and manage
 npm install -g @mcp-installer/cli
 ```
 
-### Basic Usage
+### Install Your First MCP Server
 
 ```bash
 # Install a server to all detected clients
@@ -23,10 +23,31 @@ mcp-installer install filesystem --clients=cursor,gemini
 
 # List available servers
 mcp-installer list --available
-
-# Check system health
-mcp-installer doctor
 ```
+
+## 🎯 Supported Clients
+
+| Client             | Status       | Config Location                                                   |
+| ------------------ | ------------ | ----------------------------------------------------------------- |
+| **Claude Desktop** | ✅ Supported | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+| **Cursor**         | ✅ Supported | `~/.cursor/mcp.json`                                              |
+| **Gemini**         | ✅ Supported | `~/.gemini/settings.json`                                         |
+| **Claude Code**    | 🔄 Planned   | CLI managed                                                       |
+| **VS Code**        | 🔄 Planned   | Extension-specific                                                |
+
+## 📦 Available MCP Servers
+
+### Development
+
+- **Playwright** - Browser automation and testing capabilities
+- **GitHub** - Interact with GitHub repositories, issues, and pull requests (requires auth)
+
+### Utility
+
+- **Filesystem** - Secure local file system access with configurable permissions
+- **SQLite** - Query and manage SQLite databases with full CRUD operations
+
+_Use `mcp-installer list --available` to see the complete list with details in a beautiful table format._
 
 ## 📋 Commands
 
@@ -93,8 +114,6 @@ mcp-installer list --installed
 mcp-installer list --installed --client=cursor
 ```
 
-git
-
 ### Update Registry
 
 ```bash
@@ -151,78 +170,16 @@ mcp-installer restore <backup-path> [options]
 - `--client <client>` - Restore specific client only
 - `--force` - Force restoration without confirmation
 
-## 🎯 Supported Clients
-
-| Client             | Status       | Config Location                                                   |
-| ------------------ | ------------ | ----------------------------------------------------------------- |
-| **Claude Desktop** | ✅ Supported | `~/Library/Application Support/Claude/claude_desktop_config.json` |
-| **Cursor**         | ✅ Supported | `~/.cursor/mcp.json`                                              |
-| **Gemini**         | ✅ Supported | `~/.gemini/settings.json`                                         |
-| **Claude Code**    | 🔄 Planned   | CLI managed                                                       |
-| **VS Code**        | 🔄 Planned   | Extension-specific                                                |
-
-## 📦 Available MCP Servers
-
-### Development
-
-- **Playwright** - Browser automation and testing
-- **GitHub** - Repository management (requires auth)
-
-### Utility
-
-- **Filesystem** - Secure local file system access
-- **SQLite** - Database operations
-
-### Web
-
-- **Brave Search** - Web search capabilities (requires auth)
-
-_Use `mcp-installer list --available` to see the complete list with details._
-
 ## 🔧 Requirements
 
 - **Node.js** >= 18.0.0
-- **pnpm** >= 8.0.0 (recommended) or **npm** >= 9.0.0
 - At least one supported AI client installed
-
-## 🛠️ Development
-
-For local development, testing, and debugging instructions, see [DEVELOPMENT.md](DEVELOPMENT.md).
-
-### Quick Start
-
-```bash
-# Install pnpm globally if needed
-npm install -g pnpm
-
-# Clone and setup
-git clone <repository-url>
-cd mcp-installer
-pnpm install
-pnpm run build
-```
-
-### Testing
-
-```bash
-# Safe testing (no real config changes)
-cd packages/cli
-node dist/index.js --help
-node dist/index.js list --available
-node dist/index.js doctor
-
-# Run test suite
-pnpm test
-```
-
-For detailed development workflows, debugging tips, and contribution guidelines, see the [Development Guide](DEVELOPMENT.md).
 
 ## 🔒 Security & Safety
 
 - **Automatic Backups**: Configurations are backed up before any changes
 - **Atomic Operations**: Changes are applied atomically to prevent corruption
 - **Validation**: All configurations are validated before writing
-- **Minimal Permissions**: Only requests necessary file system access
 
 ## 🐛 Troubleshooting
 
@@ -239,12 +196,6 @@ For detailed development workflows, debugging tips, and contribution guidelines,
 - Verify you have the required permissions to write config files
 - Some servers require environment variables (check server documentation)
 
-**"Config validation failed"**
-
-- Your existing config file may have syntax errors
-- Use `mcp-installer doctor` to identify issues
-- Restore from backup if needed: `mcp-installer restore <backup-path>`
-
 ### Getting Help
 
 ```bash
@@ -253,10 +204,24 @@ mcp-installer doctor
 
 # Validate configurations
 mcp-installer doctor --client=cursor
-
-# List backups
-ls ~/.mcp-installer/backups/
 ```
+
+## 🛠️ Development
+
+For local development and testing:
+
+```bash
+# Install pnpm globally if needed
+npm install -g pnpm
+
+# Clone and setup
+git clone <repository-url>
+cd mcp-installer
+pnpm install
+pnpm run build
+```
+
+For detailed development workflows, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ## 📄 License
 
@@ -265,13 +230,6 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ## 🤝 Contributing
 
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-### Adding New MCP Servers
-
-1. Test the server manually with target clients
-2. Add entry to `packages/registry/servers.json`
-3. Validate with schema: `npm run validate`
-4. Submit pull request with documentation
 
 ---
 
