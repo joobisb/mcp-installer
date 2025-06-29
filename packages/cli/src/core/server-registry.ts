@@ -2,6 +2,7 @@ import fsExtra from 'fs-extra';
 const { readFile } = fsExtra;
 import { join } from 'path';
 import { existsSync } from 'fs';
+import os from 'os';
 import {
   MCPServer,
   ServerRegistry as ServerRegistryType,
@@ -10,94 +11,73 @@ import {
 
 export class ServerRegistry {
   private servers: MCPServer[] = [];
-  private registryPath: string;
 
-  constructor(registryPath?: string) {
-    this.registryPath = registryPath || this.getDefaultRegistryPath();
-  }
+  constructor(private customRegistryPath?: string) {}
 
-  private getDefaultRegistryPath(): string {
-    // In test environment, use a simple fallback
-    if (process.env.NODE_ENV === 'test' || typeof jest !== 'undefined') {
-      return join(process.cwd(), 'registry', 'servers.json');
+  private getRegistryPaths(): string[] {
+    // If a custom path is provided, only try that
+    if (this.customRegistryPath) {
+      return [this.customRegistryPath];
     }
 
-    // For development (monorepo), use relative path to registry package
-    return join(process.cwd(), '..', 'registry', 'servers.json');
-  }
+    const currentDir = process.cwd();
 
-  private async tryLoadEmbeddedRegistry(): Promise<ServerRegistryType | null> {
-    try {
-      // Try to load embedded registry (only available in published package)
-      const { fileURLToPath } = require('url');
-      const { dirname } = require('path');
+    return [
+      // Published: User home pattern (~/.mcp-installer/servers.json)
+      join(os.homedir(), '.mcp-installer', 'servers.json'),
 
-      // Get path relative to the built file
-      const importMeta = eval('import.meta');
-      if (importMeta && importMeta.url) {
-        const __filename = fileURLToPath(importMeta.url);
-        const __dirname = dirname(__filename);
-        const embeddedPath = join(__dirname, '..', 'registry-data.json');
+      // Published/Development: CLI package root
+      join(currentDir, 'servers.json'),
 
-        if (existsSync(embeddedPath)) {
-          const content = await readFile(embeddedPath, 'utf-8');
-          return JSON.parse(content);
-        }
-      }
+      // Development: Registry package (monorepo sibling)
+      join(currentDir, '..', 'registry', 'servers.json'),
 
-      // Alternative: try package root (for npm package)
-      const packageRoot = join(__dirname, '..', '..');
-      const rootEmbeddedPath = join(packageRoot, 'registry-data.json');
+      // Development: From CLI dist/ back to registry
+      join(currentDir, '..', '..', 'registry', 'servers.json'),
 
-      if (existsSync(rootEmbeddedPath)) {
-        const content = await readFile(rootEmbeddedPath, 'utf-8');
-        return JSON.parse(content);
-      }
-
-      return null;
-    } catch {
-      return null;
-    }
+      // Test environment: fallback
+      join(currentDir, 'registry', 'servers.json'),
+    ];
   }
 
   async loadRegistry(): Promise<void> {
-    let registry: ServerRegistryType;
+    const possiblePaths = this.getRegistryPaths();
+    let lastError: Error | null = null;
 
-    // Strategy 1: Try embedded registry first (npm package)
-    try {
-      const embeddedRegistry = await this.tryLoadEmbeddedRegistry();
-      if (embeddedRegistry) {
-        registry = embeddedRegistry;
+    for (const registryPath of possiblePaths) {
+      try {
+        if (existsSync(registryPath)) {
+          console.log(`Loading registry from: ${registryPath}`);
+          const content = await readFile(registryPath, 'utf-8');
+          const registry: ServerRegistryType = JSON.parse(content);
 
-        if (!registry.servers || !Array.isArray(registry.servers)) {
-          throw new Error('Invalid embedded registry format: missing or invalid servers array');
+          if (!registry.servers || !Array.isArray(registry.servers)) {
+            const error = new Error('Invalid registry format: missing or invalid servers array');
+            console.log(`Failed to load registry from ${registryPath}: ${error.message}`);
+            lastError = error;
+            continue;
+          }
+
+          this.servers = registry.servers;
+          console.log(`Successfully loaded ${this.servers.length} servers`);
+          return;
         }
-
-        this.servers = registry.servers;
-        return;
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.log(`Failed to load registry from ${registryPath}: ${errorMessage}`);
+        lastError = error instanceof Error ? error : new Error(errorMessage);
+        continue;
       }
-    } catch (error) {
-      console.warn(
-        'Failed to load embedded registry, trying file...',
-        error instanceof Error ? error.message : 'Unknown error'
-      );
     }
 
-    // Strategy 2: Fall back to file-based loading (development)
-    try {
-      const content = await readFile(this.registryPath, 'utf-8');
-      registry = JSON.parse(content);
-
-      if (!registry.servers || !Array.isArray(registry.servers)) {
-        throw new Error('Invalid registry format: missing or invalid servers array');
-      }
-
-      this.servers = registry.servers;
-    } catch (error) {
-      throw new Error(
-        `Failed to load server registry: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
+    // If we had a specific error (like invalid format), throw that instead of generic message
+    if (lastError && lastError.message.includes('Invalid registry format')) {
+      throw lastError;
     }
+
+    throw new Error(
+      `Failed to load server registry. Searched paths:\n${possiblePaths.map((p) => `  - ${p}`).join('\n')}`
+    );
   }
 
   async getServer(serverId: string): Promise<MCPServer | null> {
@@ -219,9 +199,5 @@ export class ServerRegistry {
 
   isLoaded(): boolean {
     return this.servers.length > 0;
-  }
-
-  getRegistryPath(): string {
-    return this.registryPath;
   }
 }
