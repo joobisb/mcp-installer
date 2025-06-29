@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import ora from 'ora';
+import Table from 'cli-table3';
 import { ClientManager, ConfigEngine, ServerRegistry } from '../core/index.js';
 import { ClientType, getClientDisplayName } from '@mcp-installer/shared';
 
@@ -23,7 +24,7 @@ export async function listCommand(options: ListOptions): Promise<void> {
       const servers = await serverRegistry.getAllServers();
 
       spinner.succeed(chalk.green('Available MCP Servers:'));
-      
+
       if (servers.length === 0) {
         console.log(chalk.yellow('  No servers found in registry'));
         return;
@@ -31,36 +32,56 @@ export async function listCommand(options: ListOptions): Promise<void> {
 
       // Group servers by category
       const categories = await serverRegistry.getCategories();
-      
+
       for (const category of categories.sort()) {
         const categoryServers = await serverRegistry.getServersByCategory(category);
         if (categoryServers.length > 0) {
-          console.log(chalk.cyan(`\\n${category.toUpperCase()}:`));
-          
-          categoryServers.forEach(server => {
-            const authIcon = server.requiresAuth ? chalk.yellow('🔐') : '  ';
-            const difficultyColor = 
-              server.difficulty === 'simple' ? chalk.green :
-              server.difficulty === 'medium' ? chalk.yellow : chalk.red;
-            
-            console.log(`${authIcon} ${chalk.bold(server.name)} (${chalk.dim(server.id)})`);
-            console.log(`    ${server.description}`);
-            console.log(`    ${difficultyColor(server.difficulty)} • ${server.type} • ${chalk.dim(server.installation.command)}`);
-            
-            if (server.tags && server.tags.length > 0) {
-              console.log(`    Tags: ${server.tags.map((tag: string) => chalk.blue(tag)).join(', ')}`);
-            }
+          console.log(chalk.cyan(`\n${category.toUpperCase()}:`));
+
+          // Create table for category servers
+          const table = new Table({
+            head: [chalk.bold('Name'), chalk.bold('Type'), chalk.bold('Auth')],
+            colWidths: [35, 20, 12],
+            style: {
+              head: ['cyan'],
+              border: ['grey'],
+            },
+            chars: {
+              top: '─',
+              'top-mid': '┬',
+              'top-left': '┌',
+              'top-right': '┐',
+              bottom: '─',
+              'bottom-mid': '┴',
+              'bottom-left': '└',
+              'bottom-right': '┘',
+              left: '│',
+              'left-mid': '├',
+              mid: '─',
+              'mid-mid': '┼',
+              right: '│',
+              'right-mid': '┤',
+              middle: '│',
+            },
           });
+
+          categoryServers.forEach((server) => {
+            const authIcon = server.requiresAuth ? chalk.yellow('🔐 Yes') : chalk.green('No');
+
+            table.push([chalk.bold(server.name), server.type, authIcon]);
+          });
+
+          console.log(table.toString());
         }
       }
 
       const stats = await serverRegistry.getServerStats();
-      console.log(chalk.dim(`\\nTotal: ${stats.total} servers`));
+      console.log(chalk.dim(`\nTotal: ${stats.total} servers available`));
     }
 
     if (showInstalled) {
       if (showAvailable) {
-        console.log('\\n' + '─'.repeat(60));
+        console.log('\n' + chalk.cyan('═'.repeat(80)));
       }
 
       spinner.start('Detecting installed clients...');
@@ -68,22 +89,24 @@ export async function listCommand(options: ListOptions): Promise<void> {
       const configEngine = new ConfigEngine();
       const allClients = await clientManager.detectInstalledClients();
 
-      let targetClients = allClients.filter(c => c.isInstalled);
+      let targetClients = allClients.filter((c) => c.isInstalled);
 
       if (options.client) {
         const clientType = options.client as ClientType;
         if (!clientManager.isClientSupported(clientType)) {
           spinner.fail(chalk.red(`Unsupported client: ${clientType}`));
-          console.log(chalk.yellow(`Supported clients: ${clientManager.getSupportedClients().join(', ')}`));
+          console.log(
+            chalk.yellow(`Supported clients: ${clientManager.getSupportedClients().join(', ')}`)
+          );
           return;
         }
-        
-        const clientInfo = allClients.find(c => c.type === clientType);
+
+        const clientInfo = allClients.find((c) => c.type === clientType);
         if (!clientInfo?.isInstalled) {
           spinner.fail(chalk.red(`Client '${getClientDisplayName(clientType)}' not detected`));
           return;
         }
-        
+
         targetClients = [clientInfo];
       }
 
@@ -94,39 +117,84 @@ export async function listCommand(options: ListOptions): Promise<void> {
       }
 
       spinner.succeed(chalk.green('Installed MCP Servers:'));
-      
+
       let totalInstalled = 0;
 
       for (const client of targetClients) {
         try {
           const installedServers = await configEngine.listInstalledServers(client.configPath);
           const serverIds = Object.keys(installedServers);
-          
-          console.log(chalk.cyan(`\\n${getClientDisplayName(client.type)}:`));
-          
+
+          console.log(chalk.cyan(`\n${getClientDisplayName(client.type)}:`));
+
           if (serverIds.length === 0) {
             console.log(chalk.dim('  No MCP servers installed'));
             continue;
           }
 
-          serverIds.forEach(serverId => {
-            const config = installedServers[serverId];
-            console.log(`  ${chalk.bold(serverId)}`);
-            console.log(`    Command: ${config.command} ${config.args?.join(' ') || ''}`);
-            if (config.env && Object.keys(config.env).length > 0) {
-              console.log(`    Environment: ${Object.keys(config.env).join(', ')}`);
-            }
+          // Create table for installed servers
+          const installedTable = new Table({
+            head: [
+              chalk.bold('Server Name'),
+              chalk.bold('Command'),
+              chalk.bold('Environment Variables'),
+            ],
+            colWidths: [25, 35, 30],
+            style: {
+              head: ['cyan'],
+              border: ['grey'],
+            },
+            chars: {
+              top: '─',
+              'top-mid': '┬',
+              'top-left': '┌',
+              'top-right': '┐',
+              bottom: '─',
+              'bottom-mid': '┴',
+              'bottom-left': '└',
+              'bottom-right': '┘',
+              left: '│',
+              'left-mid': '├',
+              mid: '─',
+              'mid-mid': '┼',
+              right: '│',
+              'right-mid': '┤',
+              middle: '│',
+            },
           });
 
+          serverIds.forEach((serverId) => {
+            const config = installedServers[serverId];
+            const fullCommand = `${config.command} ${config.args?.join(' ') || ''}`.trim();
+            const commandDisplay =
+              fullCommand.length > 32 ? fullCommand.substring(0, 29) + '...' : fullCommand;
+
+            const envVars =
+              config.env && Object.keys(config.env).length > 0
+                ? Object.keys(config.env).join(', ')
+                : chalk.dim('none');
+            const envDisplay = envVars.length > 27 ? envVars.substring(0, 24) + '...' : envVars;
+
+            installedTable.push([chalk.bold(serverId), commandDisplay, envDisplay]);
+          });
+
+          console.log(installedTable.toString());
           totalInstalled += serverIds.length;
         } catch (error) {
-          console.log(chalk.red(`  Error reading config: ${error instanceof Error ? error.message : 'Unknown error'}`));
+          console.log(
+            chalk.red(
+              `  Error reading config: ${error instanceof Error ? error.message : 'Unknown error'}`
+            )
+          );
         }
       }
 
-      console.log(chalk.dim(`\\nTotal installed: ${totalInstalled} servers across ${targetClients.length} client(s)`));
+      console.log(
+        chalk.dim(
+          `\nTotal installed: ${totalInstalled} servers across ${targetClients.length} client(s)`
+        )
+      );
     }
-
   } catch (error) {
     spinner.fail(chalk.red('Failed to list servers'));
     console.error(chalk.red(error instanceof Error ? error.message : 'Unknown error'));
