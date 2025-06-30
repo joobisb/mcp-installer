@@ -304,105 +304,133 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Category Filter */}
+      {/* Category Filters */}
       <div className="bg-white/30 border-y border-orange-100/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-wrap gap-2 justify-center">
-            {categories.map((category) => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? 'default' : 'outline'}
-                onClick={() => setSelectedCategory(category)}
-                className={`capitalize backdrop-blur-sm transition-all duration-300 ${
-                  selectedCategory === category
-                    ? 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-lg shadow-amber-500/25 text-white border-0'
-                    : 'bg-white/60 border-orange-200/50 text-amber-700 hover:bg-white/80 hover:border-orange-300/50 shadow-md'
-                }`}
-              >
-                {category === 'all' ? 'All Categories' : category}
-              </Button>
-            ))}
-          </div>
+          <Tabs
+            value={selectedCategory}
+            onValueChange={setSelectedCategory}
+            className="flex justify-center"
+          >
+            <div className="p-1.5 bg-white/60 backdrop-blur-md rounded-full border border-orange-200/50 shadow-lg">
+              <TabsList className="bg-transparent p-0">
+                {categories.map((category) => (
+                  <TabsTrigger
+                    key={category}
+                    value={category}
+                    className="px-4 py-2 text-sm font-semibold text-amber-700 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-amber-900 rounded-full transition-all duration-300"
+                  >
+                    {category === 'ai' || category === 'crm'
+                      ? category.toUpperCase()
+                      : category.charAt(0).toUpperCase() + category.slice(1)}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </div>
+          </Tabs>
         </div>
       </div>
 
       {/* Server Grid */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center md:place-items-start">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredServers.map((server) => {
             const CategoryIcon = categoryIcons[server.category] || Package;
 
             return (
               <Card
                 key={server.id}
-                className="w-full max-w-sm group hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-300 cursor-pointer border-orange-200/30 hover:border-orange-300/50 bg-white/70 backdrop-blur-md hover:bg-white/80 hover:-translate-y-1"
+                className="flex flex-col transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-2xl hover:border-orange-300/80 bg-white/60 backdrop-blur-md border border-orange-200/50 shadow-lg rounded-2xl overflow-hidden"
                 onClick={() => setSelectedServer(server)}
               >
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-amber-100 rounded-lg group-hover:bg-amber-200 transition-colors">
-                        <CategoryIcon className="h-5 w-5 text-amber-600" />
-                      </div>
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          <CardTitle className="text-lg font-semibold text-gray-900 group-hover:text-amber-900 transition-colors">
-                            {server.name}
-                          </CardTitle>
-                          <VerifiedBadge />
+                <CardHeader className="flex-shrink-0">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-grow">
+                      <div className="flex items-center space-x-3">
+                        <div className="p-2 bg-amber-100 rounded-lg group-hover:bg-amber-200 transition-colors">
+                          <CategoryIcon className="h-5 w-5 text-amber-600" />
                         </div>
-                        <p className="text-sm text-gray-500">by {server.author}</p>
+                        <div>
+                          <div className="flex items-center space-x-2">
+                            <CardTitle className="text-lg font-semibold text-gray-900 group-hover:text-amber-900 transition-colors">
+                              {server.name}
+                            </CardTitle>
+                            <VerifiedBadge />
+                          </div>
+                          <p className="text-sm text-gray-500">by {server.author}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </CardHeader>
 
-                <CardContent className="pt-0">
-                  <CardDescription className="text-gray-600 mb-4 line-clamp-2">
+                <CardContent className="flex-grow flex flex-col">
+                  <CardDescription className="text-gray-600 mb-4 line-clamp-2 min-h-[40px]">
                     {server.description}
                   </CardDescription>
-
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    <Badge className={`text-xs ${difficultyColors[server.difficulty]} border`}>
-                      {server.difficulty}
-                    </Badge>
-                    {server.requiresAuth && (
-                      <Badge
-                        variant="outline"
-                        className="text-xs border-amber-200 text-amber-700 bg-amber-50"
-                      >
-                        <Shield className="h-3 w-3 mr-1" />
-                        Auth Required
-                      </Badge>
-                    )}
-                    {server.parameters && Object.keys(server.parameters).length > 0 && (
-                      <Badge
-                        variant="outline"
-                        className="text-xs border-blue-200 text-blue-700 bg-blue-50"
-                      >
-                        <Wrench className="h-3 w-3 mr-1" />
-                        Configuration Required
-                      </Badge>
-                    )}
-                  </div>
-
-                  <div className="flex flex-wrap gap-1">
-                    {server.tags.slice(0, 3).map((tag) => (
-                      <Badge
-                        key={tag}
-                        variant="secondary"
-                        className="text-xs bg-amber-50 text-amber-700 hover:bg-amber-100"
-                      >
-                        {tag}
-                      </Badge>
-                    ))}
-                    {server.tags.length > 3 && (
-                      <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-600">
-                        +{server.tags.length - 3} more
-                      </Badge>
-                    )}
-                  </div>
                 </CardContent>
+
+                {/* Footer */}
+                <div className="mt-auto p-4 border-t border-orange-200/50 bg-amber-50/20">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-amber-700 hover:bg-amber-100/50"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          copyToClipboard(getInstallCommand(server));
+                        }}
+                      >
+                        <Copy className="h-4 w-4 mr-2" />
+                        Install
+                      </Button>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      {server.documentation && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-amber-700 hover:bg-amber-100/50"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(server.documentation, '_blank');
+                              }}
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Documentation</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                      {server.repository && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-amber-700 hover:bg-amber-100/50"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(server.repository, '_blank');
+                              }}
+                            >
+                              <Github className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Repository</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </Card>
             );
           })}
