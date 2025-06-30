@@ -1,0 +1,70 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with gradient -->
+  <circle cx="32" cy="32" r="30" fill="url(#gradient)" stroke="url(#borderGradient)" stroke-width="2"/>
+  
+  <!-- Central hub circle -->
+  <circle cx="32" cy="32" r="6" fill="#ffffff" stroke="#d97706" stroke-width="1.5"/>
+  
+  <!-- Connection lines radiating from center -->
+  <g stroke="#d97706" stroke-width="2" opacity="0.8">
+    <!-- Top -->
+    <line x1="32" y1="26" x2="32" y2="12"/>
+    <!-- Top-right -->
+    <line x1="36.24" y1="27.76" x2="46.49" y2="17.51"/>
+    <!-- Right -->
+    <line x1="38" y1="32" x2="52" y2="32"/>
+    <!-- Bottom-right -->
+    <line x1="36.24" y1="36.24" x2="46.49" y2="46.49"/>
+    <!-- Bottom -->
+    <line x1="32" y1="38" x2="32" y2="52"/>
+    <!-- Bottom-left -->
+    <line x1="27.76" y1="36.24" x2="17.51" y2="46.49"/>
+    <!-- Left -->
+    <line x1="26" y1="32" x2="12" y2="32"/>
+    <!-- Top-left -->
+    <line x1="27.76" y1="27.76" x2="17.51" y2="17.51"/>
+  </g>
+  
+  <!-- Endpoint circles representing different AI clients -->
+  <g fill="#ffffff" stroke="#d97706" stroke-width="1.5">
+    <!-- Top (Claude) -->
+    <circle cx="32" cy="12" r="4"/>
+    <!-- Top-right (Cursor) -->
+    <circle cx="46.49" cy="17.51" r="4"/>
+    <!-- Right (Gemini) -->
+    <circle cx="52" cy="32" r="4"/>
+    <!-- Bottom-right -->
+    <circle cx="46.49" cy="46.49" r="4"/>
+    <!-- Bottom -->
+    <circle cx="32" cy="52" r="4"/>
+    <!-- Bottom-left -->
+    <circle cx="17.51" cy="46.49" r="4"/>
+    <!-- Left -->
+    <circle cx="12" cy="32" r="4"/>
+    <!-- Top-left -->
+    <circle cx="17.51" cy="17.51" r="4"/>
+  </g>
+  
+  <!-- Small indicators in some endpoint circles -->
+  <g fill="#d97706">
+    <!-- Claude indicator -->
+    <circle cx="32" cy="12" r="1.5"/>
+    <!-- Cursor indicator -->
+    <circle cx="46.49" cy="17.51" r="1.5"/>
+    <!-- Gemini indicator -->
+    <circle cx="52" cy="32" r="1.5"/>
+  </g>
+  
+  <!-- Gradients -->
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fef3c7;stop-opacity:0.9"/>
+      <stop offset="50%" style="stop-color:#fed7aa;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#fdba74;stop-opacity:0.9"/>
+    </linearGradient>
+    <linearGradient id="borderGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#d97706;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#ea580c;stop-opacity:0.8"/>
+    </linearGradient>
+  </defs>
+</svg>
