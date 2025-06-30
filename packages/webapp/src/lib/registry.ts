@@ -1,11 +1,33 @@
+export interface MCPServerParameter {
+  type:
+    | 'path'
+    | 'file_path'
+    | 'directory_path'
+    | 'api_key'
+    | 'string'
+    | 'number'
+    | 'boolean'
+    | 'url';
+  required: boolean;
+  description: string;
+  placeholder?: string;
+  validation?: {
+    pattern?: string;
+    minLength?: number;
+    maxLength?: number;
+  };
+  default?: string;
+}
+
 export interface MCPServer {
   id: string;
   name: string;
   description: string;
-  category: 'development' | 'database' | 'utility' | 'search' | 'productivity';
+  category: 'development' | 'productivity' | 'database' | 'web' | 'ai' | 'utility';
   type: 'stdio' | 'http';
-  difficulty: 'simple' | 'medium' | 'complex';
+  difficulty: 'simple' | 'medium' | 'advanced';
   requiresAuth: boolean;
+  parameters?: Record<string, MCPServerParameter>;
   installation: {
     command: string;
     args: string[];
@@ -14,6 +36,7 @@ export interface MCPServer {
   documentation: string;
   repository?: string;
   tags: string[];
+  version?: string;
   author: string;
   validatedOn: string;
 }

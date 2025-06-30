@@ -4,11 +4,14 @@ import { existsSync } from 'fs';
 import { ClientInfo, ClientType } from '@mcp-installer/shared';
 
 export class ClientManager {
-  private static readonly CLIENT_CONFIGS: Record<ClientType, {
-    name: string;
-    configPaths: string[];
-    detectCommand?: string;
-  }> = {
+  private static readonly CLIENT_CONFIGS: Record<
+    ClientType,
+    {
+      name: string;
+      configPaths: string[];
+      detectCommand?: string;
+    }
+  > = {
     'claude-desktop': {
       name: 'Claude Desktop',
       configPaths: [
@@ -17,24 +20,22 @@ export class ClientManager {
         join(homedir(), 'AppData', 'Roaming', 'Claude', 'claude_desktop_config.json'), // Windows
       ],
     },
-    'cursor': {
+    cursor: {
       name: 'Cursor',
-      configPaths: [
-        join(homedir(), '.cursor', 'mcp.json'),
-      ],
+      configPaths: [join(homedir(), '.cursor', 'mcp.json')],
     },
-    'gemini': {
+    gemini: {
       name: 'Gemini',
-      configPaths: [
-        join(homedir(), '.gemini', 'settings.json'),
-      ],
+      configPaths: [join(homedir(), '.gemini', 'settings.json')],
     },
     'claude-code': {
       name: 'Claude Code',
-      configPaths: [],
+      configPaths: [
+        join(homedir(), '.claude.json'), // Global configuration
+      ],
       detectCommand: 'claude',
     },
-    'vscode': {
+    vscode: {
       name: 'VS Code',
       configPaths: [
         join(homedir(), '.vscode', 'extensions'),
@@ -43,11 +44,9 @@ export class ClientManager {
         join(homedir(), 'AppData', 'Roaming', 'Code', 'User'), // Windows
       ],
     },
-    'windsurf': {
+    windsurf: {
       name: 'Windsurf',
-      configPaths: [
-        join(homedir(), '.windsurf', 'settings.json'),
-      ],
+      configPaths: [join(homedir(), '.windsurf', 'settings.json')],
     },
     'qodo-gen': {
       name: 'Qodo Gen',
@@ -69,7 +68,7 @@ export class ClientManager {
 
   async detectClient(type: ClientType): Promise<ClientInfo> {
     const config = ClientManager.CLIENT_CONFIGS[type];
-    
+
     if (!config) {
       return {
         type,
@@ -90,7 +89,7 @@ export class ClientManager {
           break;
         }
       }
-      
+
       if (!isInstalled && config.configPaths.length > 0) {
         configPath = config.configPaths[0];
       }

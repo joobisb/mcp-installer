@@ -2,16 +2,20 @@ import fsExtra from 'fs-extra';
 const { readFile, writeFile, ensureDir, copy } = fsExtra;
 import { dirname, join } from 'path';
 import { existsSync } from 'fs';
-import { 
-  ClientType, 
-  ClientConfig, 
-  MCPServerConfig, 
+import {
+  ClientType,
+  ClientConfig,
+  MCPServerConfig,
   ValidationResult,
-  BackupInfo
+  BackupInfo,
 } from '@mcp-installer/shared';
 
 export class ConfigEngine {
-  private static readonly BACKUP_DIR = join(process.env.HOME || process.env.USERPROFILE || '~', '.mcp-installer', 'backups');
+  private static readonly BACKUP_DIR = join(
+    process.env.HOME || process.env.USERPROFILE || '~',
+    '.mcp-installer',
+    'backups'
+  );
 
   async readConfig(configPath: string): Promise<ClientConfig> {
     try {
@@ -21,14 +25,16 @@ export class ConfigEngine {
 
       const content = await readFile(configPath, 'utf-8');
       const config = JSON.parse(content) as ClientConfig;
-      
+
       if (!config.mcpServers) {
         config.mcpServers = {};
       }
 
       return config;
     } catch (error) {
-      throw new Error(`Failed to read config from ${configPath}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to read config from ${configPath}: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -38,7 +44,9 @@ export class ConfigEngine {
       const content = JSON.stringify(config, null, 2);
       await writeFile(configPath, content, 'utf-8');
     } catch (error) {
-      throw new Error(`Failed to write config to ${configPath}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to write config to ${configPath}: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -100,10 +108,10 @@ export class ConfigEngine {
       }
 
       const content = await readFile(configPath, 'utf-8');
-      
+
       try {
         const config = JSON.parse(content) as ClientConfig;
-        
+
         if (!config.mcpServers) {
           result.warnings.push('No mcpServers section found in config');
           return result;
@@ -121,7 +129,9 @@ export class ConfigEngine {
           const isLocalServer = !!serverConfig.command;
 
           if (!isRemoteServer && !isLocalServer) {
-            result.errors.push(`Server '${serverId}' must have either 'command' (for local servers) or 'url' (for remote servers)`);
+            result.errors.push(
+              `Server '${serverId}' must have either 'command' (for local servers) or 'url' (for remote servers)`
+            );
             result.isValid = false;
           }
 
@@ -162,16 +172,22 @@ export class ConfigEngine {
 
           // Don't allow both url and command
           if (isRemoteServer && isLocalServer) {
-            result.errors.push(`Server '${serverId}' cannot have both 'url' and 'command' - choose one`);
+            result.errors.push(
+              `Server '${serverId}' cannot have both 'url' and 'command' - choose one`
+            );
             result.isValid = false;
           }
         }
       } catch (parseError) {
-        result.errors.push(`Invalid JSON format: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
+        result.errors.push(
+          `Invalid JSON format: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`
+        );
         result.isValid = false;
       }
     } catch (error) {
-      result.errors.push(`Failed to read config: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      result.errors.push(
+        `Failed to read config: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
       result.isValid = false;
     }
 
@@ -217,6 +233,7 @@ export class ConfigEngine {
   private inferClientFromPath(configPath: string): ClientType {
     if (configPath.includes('.cursor')) return 'cursor';
     if (configPath.includes('.gemini')) return 'gemini';
+    if (configPath.includes('.claude.json')) return 'claude-code';
     if (configPath.includes('Claude')) return 'claude-desktop';
     if (configPath.includes('.vscode') || configPath.includes('Code')) return 'vscode';
     if (configPath.includes('.windsurf')) return 'windsurf';

@@ -18,7 +18,7 @@ jest.mock('fs', () => {
   };
 });
 
-// Mock fs-extra completely  
+// Mock fs-extra completely
 jest.mock('fs-extra', () => {
   const memfs = require('memfs');
   return {
@@ -76,6 +76,48 @@ jest.mock('child_process', () => ({
   }),
 }));
 
+// Mock inquirer for ParameterHandler
+jest.mock('inquirer', () => ({
+  default: {
+    prompt: jest.fn(),
+  },
+  prompt: jest.fn(),
+}));
+
+// Mock chalk for ParameterHandler
+jest.mock('chalk', () => ({
+  default: {
+    cyan: jest.fn((str) => str),
+    yellow: jest.fn((str) => str),
+    gray: jest.fn((str) => str),
+    red: jest.fn((str) => str),
+    green: jest.fn((str) => str),
+  },
+  cyan: jest.fn((str) => str),
+  yellow: jest.fn((str) => str),
+  gray: jest.fn((str) => str),
+  red: jest.fn((str) => str),
+  green: jest.fn((str) => str),
+}));
+
+// Mock ora for install command
+jest.mock('ora', () => ({
+  default: jest.fn(() => ({
+    start: jest.fn(() => ({
+      stop: jest.fn(),
+      succeed: jest.fn(),
+      fail: jest.fn(),
+      warn: jest.fn(),
+      info: jest.fn(),
+    })),
+    stop: jest.fn(),
+    succeed: jest.fn(),
+    fail: jest.fn(),
+    warn: jest.fn(),
+    info: jest.fn(),
+  })),
+}));
+
 // Global test utilities
 beforeEach(() => {
   vol.reset();
@@ -83,4 +125,4 @@ beforeEach(() => {
 
 afterEach(() => {
   vol.reset();
-}); 
+});

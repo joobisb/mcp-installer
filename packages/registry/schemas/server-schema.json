@@ -45,6 +45,60 @@
           "requiresAuth": {
             "type": "boolean"
           },
+          "parameters": {
+            "type": "object",
+            "description": "Parameters that require user input during installation",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "path",
+                    "file_path",
+                    "directory_path",
+                    "api_key",
+                    "string",
+                    "number",
+                    "boolean",
+                    "url"
+                  ]
+                },
+                "required": {
+                  "type": "boolean",
+                  "default": true
+                },
+                "description": {
+                  "type": "string",
+                  "description": "User-friendly description of what this parameter is for"
+                },
+                "placeholder": {
+                  "type": "string",
+                  "description": "Example value to show the user"
+                },
+                "validation": {
+                  "type": "object",
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "description": "Regex pattern for validation"
+                    },
+                    "minLength": {
+                      "type": "number"
+                    },
+                    "maxLength": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "default": {
+                  "type": "string",
+                  "description": "Default value if parameter is optional and user doesn't provide one"
+                }
+              },
+              "required": ["type", "description"]
+            }
+          },
           "installation": {
             "type": "object",
             "properties": {
@@ -56,13 +110,15 @@
                 "type": "array",
                 "items": {
                   "type": "string"
-                }
+                },
+                "description": "Arguments can contain parameter placeholders like {{parameter_name}}"
               },
               "env": {
                 "type": "object",
                 "additionalProperties": {
                   "type": "string"
-                }
+                },
+                "description": "Environment variables can contain parameter placeholders like {{api_key}}"
               }
             },
             "required": ["command", "args"],
@@ -94,7 +150,17 @@
             "description": "Date when server was last manually validated"
           }
         },
-        "required": ["id", "name", "description", "category", "type", "difficulty", "requiresAuth", "installation", "documentation"],
+        "required": [
+          "id",
+          "name",
+          "description",
+          "category",
+          "type",
+          "difficulty",
+          "requiresAuth",
+          "installation",
+          "documentation"
+        ],
         "additionalProperties": false
       }
     }

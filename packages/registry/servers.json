@@ -28,13 +28,36 @@
       "type": "stdio",
       "difficulty": "simple",
       "requiresAuth": false,
+      "parameters": {
+        "desktop_path": {
+          "type": "directory_path",
+          "required": false,
+          "description": "Path to your Desktop directory for file access",
+          "placeholder": "/Users/yourusername/Desktop",
+          "default": ""
+        },
+        "downloads_path": {
+          "type": "directory_path",
+          "required": false,
+          "description": "Path to your Downloads directory for file access",
+          "placeholder": "/Users/yourusername/Downloads",
+          "default": ""
+        },
+        "additional_paths": {
+          "type": "string",
+          "required": false,
+          "description": "Additional comma-separated directory paths to grant access to",
+          "placeholder": "/Users/yourusername/Documents,/Users/yourusername/Projects"
+        }
+      },
       "installation": {
         "command": "npx",
         "args": [
           "-y",
           "@modelcontextprotocol/server-filesystem",
-          "/Users/user/Desktop",
-          "/Users/user/Downloads"
+          "{{desktop_path}}",
+          "{{downloads_path}}",
+          "{{additional_paths}}"
         ]
       },
       "documentation": "https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem",
@@ -51,12 +74,20 @@
       "type": "stdio",
       "difficulty": "simple",
       "requiresAuth": false,
-      "installation": {
-        "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-sqlite", "/path/to/database.db"]
+      "parameters": {
+        "database_path": {
+          "type": "file_path",
+          "required": true,
+          "description": "Path to your SQLite database file",
+          "placeholder": "/path/to/your/database.db"
+        }
       },
-      "documentation": "https://github.com/modelcontextprotocol/servers/tree/main/src/sqlite",
-      "repository": "https://github.com/modelcontextprotocol/servers",
+      "installation": {
+        "command": "uvx",
+        "args": ["mcp-server-sqlite", "--db-path", "{{database_path}}"]
+      },
+      "documentation": "https://github.com/modelcontextprotocol/servers-archived/tree/main/src/sqlite",
+      "repository": "https://github.com/modelcontextprotocol/servers-archived/tree/main/src/sqlite",
       "tags": ["database", "sql", "sqlite"],
       "author": "MCP Team",
       "validatedOn": "2024-12-28"
@@ -69,14 +100,331 @@
       "type": "stdio",
       "difficulty": "medium",
       "requiresAuth": true,
+      "parameters": {
+        "github_token": {
+          "type": "api_key",
+          "required": true,
+          "description": "GitHub Personal Access Token for API access",
+          "placeholder": "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        }
+      },
+      "installation": {
+        "command": "docker",
+        "args": [
+          "run",
+          "-i",
+          "--rm",
+          "-e",
+          "GITHUB_PERSONAL_ACCESS_TOKEN",
+          "ghcr.io/github/github-mcp-server"
+        ],
+        "env": {
+          "GITHUB_PERSONAL_ACCESS_TOKEN": "{{github_token}}"
+        }
+      },
+      "documentation": "https://github.com/github/github-mcp-server",
+      "repository": "https://github.com/github/github-mcp-server",
+      "tags": ["github", "git", "version-control", "repositories"],
+      "author": "GitHub",
+      "validatedOn": "2024-12-28"
+    },
+    {
+      "id": "git",
+      "name": "Git",
+      "description": "Interact with Git repositories.",
+      "category": "development",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": false,
+      "installation": {
+        "command": "uvx",
+        "args": ["mcp-server-git"]
+      },
+      "documentation": "https://github.com/modelcontextprotocol/servers/tree/main/src/git",
+      "repository": "https://github.com/modelcontextprotocol/servers",
+      "author": "MCP Team",
+      "tags": ["git", "version-control"],
+      "validatedOn": "2024-12-28"
+    },
+    {
+      "id": "memory",
+      "name": "Memory",
+      "description": "In-memory data store for temporary data.",
+      "category": "utility",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": false,
       "installation": {
         "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-github"]
+        "args": ["-y", "@modelcontextprotocol/server-memory"]
       },
-      "documentation": "https://github.com/modelcontextprotocol/servers/tree/main/src/github",
+      "documentation": "https://github.com/modelcontextprotocol/servers/tree/main/src/memory",
       "repository": "https://github.com/modelcontextprotocol/servers",
-      "tags": ["github", "git", "version-control", "repositories"],
       "author": "MCP Team",
+      "tags": ["memory", "storage"],
+      "validatedOn": "2024-12-28"
+    },
+    {
+      "id": "sequential-thinking",
+      "name": "Sequential Thinking",
+      "description": "A server for sequential thinking tasks.",
+      "category": "ai",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": false,
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+      },
+      "documentation": "https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking",
+      "repository": "https://github.com/modelcontextprotocol/servers",
+      "author": "MCP Team",
+      "tags": ["ai", "reasoning"],
+      "validatedOn": "2024-12-28"
+    },
+    {
+      "id": "grafana",
+      "name": "Grafana",
+      "description": "Interact with Grafana dashboards and data sources.",
+      "category": "monitoring",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "grafana_url": {
+          "type": "string",
+          "required": true,
+          "description": "URL of your Grafana instance",
+          "default": "http://localhost:3000"
+        },
+        "grafana_api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Grafana service account token"
+        }
+      },
+      "installation": {
+        "command": "docker",
+        "args": [
+          "run",
+          "--rm",
+          "-i",
+          "-e",
+          "GRAFANA_URL={{grafana_url}}",
+          "-e",
+          "GRAFANA_API_KEY={{grafana_api_key}}",
+          "mcp/grafana",
+          "-t",
+          "stdio",
+          "-debug"
+        ]
+      },
+      "documentation": "https://github.com/grafana/mcp-grafana",
+      "repository": "https://github.com/grafana/mcp-grafana",
+      "author": "Grafana",
+      "tags": ["grafana", "monitoring", "dashboards"],
+      "validatedOn": "2024-12-28"
+    },
+    {
+      "id": "hubspot",
+      "name": "HubSpot",
+      "description": "Interact with the HubSpot CRM.",
+      "category": "crm",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "hubspot_token": {
+          "type": "api_key",
+          "required": true,
+          "description": "HubSpot Private App Access Token"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@hubspot/mcp-server"],
+        "env": {
+          "PRIVATE_APP_ACCESS_TOKEN": "{{hubspot_token}}"
+        }
+      },
+      "documentation": "https://developers.hubspot.com/mcp",
+      "repository": "https://github.com/HubSpot/mcp-server",
+      "author": "HubSpot",
+      "tags": ["hubspot", "crm"],
+      "validatedOn": "2024-12-28"
+    },
+    {
+      "id": "honeycomb",
+      "name": "Honeycomb",
+      "description": "Query Honeycomb observability data.",
+      "category": "monitoring",
+      "type": "stdio",
+      "difficulty": "complex",
+      "requiresAuth": true,
+      "parameters": {
+        "honeycomb_api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your Honeycomb API key"
+        },
+        "path_to_repo": {
+          "type": "string",
+          "required": true,
+          "description": "Absolute path to the cloned honeycomb-mcp repository"
+        }
+      },
+      "installation": {
+        "command": "node",
+        "args": ["{{path_to_repo}}/build/index.mjs"],
+        "env": {
+          "HONEYCOMB_API_KEY": "{{honeycomb_api_key}}"
+        }
+      },
+      "documentation": "https://github.com/honeycombio/honeycomb-mcp",
+      "repository": "https://github.com/honeycombio/honeycomb-mcp",
+      "author": "honeycombio",
+      "tags": ["honeycomb", "observability", "monitoring"],
+      "validatedOn": "2024-12-28"
+    },
+    {
+      "id": "alibaba-cloud-rds",
+      "name": "Alibaba Cloud RDS",
+      "description": "Manage Alibaba Cloud RDS instances.",
+      "category": "database",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "alibaba_cloud_access_key_id": {
+          "type": "api_key",
+          "required": true,
+          "description": "Alibaba Cloud Access Key ID"
+        },
+        "alibaba_cloud_access_key_secret": {
+          "type": "api_key",
+          "required": true,
+          "description": "Alibaba Cloud Access Key Secret"
+        }
+      },
+      "installation": {
+        "command": "uvx",
+        "args": ["alibabacloud-rds-openapi-mcp-server@latest"],
+        "env": {
+          "ALIBABA_CLOUD_ACCESS_KEY_ID": "{{alibaba_cloud_access_key_id}}",
+          "ALIBABA_CLOUD_ACCESS_KEY_SECRET": "{{alibaba_cloud_access_key_secret}}"
+        }
+      },
+      "documentation": "https://github.com/aliyun/alibabacloud-rds-openapi-mcp-server",
+      "repository": "https://github.com/aliyun/alibabacloud-rds-openapi-mcp-server",
+      "author": "Alibaba Cloud",
+      "tags": ["alibaba-cloud", "rds", "database"],
+      "validatedOn": "2024-12-28"
+    },
+    {
+      "id": "cloudflare-observability",
+      "name": "Cloudflare Observability",
+      "description": "Access Cloudflare observability data.",
+      "category": "monitoring",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": true,
+      "installation": {
+        "command": "npx",
+        "args": ["mcp-remote", "https://observability.mcp.cloudflare.com/sse"]
+      },
+      "documentation": "https://github.com/cloudflare/mcp-server-cloudflare",
+      "repository": "https://github.com/cloudflare/mcp-server-cloudflare",
+      "author": "Cloudflare",
+      "tags": ["cloudflare", "observability", "monitoring"],
+      "validatedOn": "2024-12-28"
+    },
+    {
+      "id": "cloudflare-bindings",
+      "name": "Cloudflare Bindings",
+      "description": "Interact with Cloudflare bindings.",
+      "category": "development",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": true,
+      "installation": {
+        "command": "npx",
+        "args": ["mcp-remote", "https://bindings.mcp.cloudflare.com/sse"]
+      },
+      "documentation": "https://github.com/cloudflare/mcp-server-cloudflare",
+      "repository": "https://github.com/cloudflare/mcp-server-cloudflare",
+      "author": "Cloudflare",
+      "tags": ["cloudflare", "bindings", "development"],
+      "validatedOn": "2024-12-28"
+    },
+    {
+      "id": "supabase",
+      "name": "Supabase",
+      "description": "Interact with Supabase projects.",
+      "category": "database",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "supabase_access_token": {
+          "type": "api_key",
+          "required": true,
+          "description": "Supabase Personal Access Token"
+        },
+        "project_ref": {
+          "type": "string",
+          "required": true,
+          "description": "Your Supabase project reference"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@supabase/mcp-server-supabase@latest",
+          "--read-only",
+          "--project-ref={{project_ref}}"
+        ],
+        "env": {
+          "SUPABASE_ACCESS_TOKEN": "{{supabase_access_token}}"
+        }
+      },
+      "documentation": "https://github.com/supabase-community/supabase-mcp",
+      "repository": "https://github.com/supabase-community/supabase-mcp",
+      "author": "Supabase Community",
+      "tags": ["supabase", "database", "postgres"],
+      "validatedOn": "2024-12-28"
+    },
+    {
+      "id": "postgres",
+      "name": "PostgreSQL",
+      "description": "Connect to and query PostgreSQL databases.",
+      "category": "database",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "database_uri": {
+          "type": "string",
+          "required": true,
+          "description": "PostgreSQL connection URI"
+        }
+      },
+      "installation": {
+        "command": "docker",
+        "args": [
+          "run",
+          "-i",
+          "--rm",
+          "-e",
+          "DATABASE_URI={{database_uri}}",
+          "crystaldba/postgres-mcp",
+          "--access-mode=unrestricted"
+        ]
+      },
+      "documentation": "https://github.com/crystaldba/postgres-mcp",
+      "repository": "https://github.com/crystaldba/postgres-mcp",
+      "author": "crystaldba",
+      "tags": ["postgres", "database", "sql"],
       "validatedOn": "2024-12-28"
     }
   ]

@@ -32,15 +32,17 @@ import { getServersData, type RegistryData, type MCPServer } from '@/lib/registr
 
 const categoryIcons = {
   development: Code,
+  productivity: Package,
   database: Database,
+  web: Search,
+  ai: Package,
   utility: Wrench,
-  search: Search,
 };
 
 const difficultyColors = {
   simple: 'bg-green-100 text-green-800 border-green-200',
   medium: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-  complex: 'bg-red-100 text-red-800 border-red-200',
+  advanced: 'bg-red-100 text-red-800 border-red-200',
 };
 
 // Verified Badge Component
@@ -142,6 +144,7 @@ const Index = () => {
     const baseCommand = getInstallCommand(server);
     const clientCommands = {
       claude: `mcp-installer install ${server.id} --clients=claude-desktop`,
+      'claude-code': `mcp-installer install ${server.id} --clients=claude`,
       cursor: `mcp-installer install ${server.id} --clients=cursor`,
       continue: `mcp-installer install ${server.id} --clients=gemini`,
       gemini: `mcp-installer install ${server.id} --clients=gemini`,
@@ -245,10 +248,10 @@ const Index = () => {
                 {/* Subtitle with glass effect */}
                 <div className="backdrop-blur-sm bg-white/40 px-6 py-5 rounded-2xl border border-orange-200/50 shadow-lg">
                   <p className="text-lg md:text-xl text-amber-800 font-medium leading-relaxed mb-2">
-                    Search your server and copy install commands with one-click simplicity
+                    Search your server and copy install commands with one-click simplicity!
                   </p>
                   <p className="text-base md:text-lg text-amber-700 font-normal">
-                    Discover and install Model Context Protocol servers
+                    Effortless server setup for all your AI clients
                   </p>
                 </div>
               </div>
@@ -372,6 +375,15 @@ const Index = () => {
                         Auth Required
                       </Badge>
                     )}
+                    {server.parameters && Object.keys(server.parameters).length > 0 && (
+                      <Badge
+                        variant="outline"
+                        className="text-xs border-blue-200 text-blue-700 bg-blue-50"
+                      >
+                        <Wrench className="h-3 w-3 mr-1" />
+                        Configuration Required
+                      </Badge>
+                    )}
                   </div>
 
                   <div className="flex flex-wrap gap-1">
@@ -471,6 +483,62 @@ const Index = () => {
                   </div>
                 </div>
 
+                {/* Parameters Section */}
+                {selectedServer.parameters && Object.keys(selectedServer.parameters).length > 0 && (
+                  <div>
+                    <h4 className="font-medium text-gray-900 mb-3">Configuration Required</h4>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div className="flex items-start space-x-2 mb-3">
+                        <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                        <div>
+                          <p className="text-sm font-medium text-blue-900 mb-1">
+                            This server requires configuration
+                          </p>
+                          <p className="text-sm text-blue-700">
+                            The following parameters need to be provided during installation:
+                          </p>
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        {Object.entries(selectedServer.parameters).map(([key, param]) => (
+                          <div key={key} className="bg-white rounded border border-blue-100 p-3">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="font-mono text-sm font-medium text-gray-900">
+                                {key}
+                              </span>
+                              <div className="flex items-center space-x-2">
+                                {param.required && (
+                                  <Badge
+                                    variant="outline"
+                                    className="text-xs border-red-200 text-red-700 bg-red-50"
+                                  >
+                                    Required
+                                  </Badge>
+                                )}
+                                <Badge
+                                  variant="outline"
+                                  className="text-xs border-gray-200 text-gray-600 bg-gray-50"
+                                >
+                                  {param.type.replace('_', ' ')}
+                                </Badge>
+                              </div>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-2">{param.description}</p>
+                            {param.placeholder && (
+                              <div className="bg-gray-50 rounded px-2 py-1">
+                                <span className="text-xs text-gray-500">Example: </span>
+                                <code className="text-xs font-mono text-gray-700">
+                                  {param.placeholder}
+                                </code>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Installation Commands */}
                 <div>
                   <h4 className="font-medium text-gray-900 mb-4">Installation Commands</h4>
@@ -478,7 +546,7 @@ const Index = () => {
                   <Tabs defaultValue="universal" className="w-full">
                     <TabsList className="grid w-full grid-cols-4">
                       <TabsTrigger value="universal">All Clients</TabsTrigger>
-                      <TabsTrigger value="claude">Claude Desktop</TabsTrigger>
+                      <TabsTrigger value="claude">Claude</TabsTrigger>
                       <TabsTrigger value="cursor">Cursor</TabsTrigger>
                       <TabsTrigger value="gemini">Gemini CLI</TabsTrigger>
                     </TabsList>
@@ -504,35 +572,62 @@ const Index = () => {
                         </code>
                         <p className="text-xs text-gray-500 mt-2">
                           This will install the server to all detected AI clients (Claude Desktop,
-                          Cursor, Gemini CLI)
+                          Claude Code, Cursor, Gemini CLI)
                         </p>
                       </div>
                     </TabsContent>
 
                     <TabsContent value="claude" className="mt-4">
-                      <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
-                        <div className="flex items-center justify-between mb-2">
-                          <h5 className="font-medium text-gray-900">
-                            Install to Claude Desktop Only
-                          </h5>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() =>
-                              copyToClipboard(getClientSpecificCommand(selectedServer, 'claude'))
-                            }
-                            className="text-amber-600 hover:text-amber-800"
-                          >
-                            <Copy className="h-4 w-4 mr-1" />
-                            Copy
-                          </Button>
+                      <div className="space-y-4">
+                        {/* Claude Desktop */}
+                        <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
+                          <div className="flex items-center justify-between mb-2">
+                            <h5 className="font-medium text-gray-900">Install to Claude Desktop</h5>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                copyToClipboard(getClientSpecificCommand(selectedServer, 'claude'))
+                              }
+                              className="text-amber-600 hover:text-amber-800"
+                            >
+                              <Copy className="h-4 w-4 mr-1" />
+                              Copy
+                            </Button>
+                          </div>
+                          <code className="block text-sm font-mono text-gray-800 bg-white p-3 rounded border">
+                            {getClientSpecificCommand(selectedServer, 'claude')}
+                          </code>
+                          <p className="text-xs text-gray-500 mt-2">
+                            This will install the server to Claude Desktop app
+                          </p>
                         </div>
-                        <code className="block text-sm font-mono text-gray-800 bg-white p-3 rounded border">
-                          {getClientSpecificCommand(selectedServer, 'claude')}
-                        </code>
-                        <p className="text-xs text-gray-500 mt-2">
-                          This will install the server only to Claude Desktop
-                        </p>
+
+                        {/* Claude Code */}
+                        <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                          <div className="flex items-center justify-between mb-2">
+                            <h5 className="font-medium text-gray-900">Install to Claude Code</h5>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                copyToClipboard(
+                                  getClientSpecificCommand(selectedServer, 'claude-code')
+                                )
+                              }
+                              className="text-blue-600 hover:text-blue-800"
+                            >
+                              <Copy className="h-4 w-4 mr-1" />
+                              Copy
+                            </Button>
+                          </div>
+                          <code className="block text-sm font-mono text-gray-800 bg-white p-3 rounded border">
+                            {getClientSpecificCommand(selectedServer, 'claude-code')}
+                          </code>
+                          <p className="text-xs text-gray-500 mt-2">
+                            This will install the server to claude cli
+                          </p>
+                        </div>
                       </div>
                     </TabsContent>
 

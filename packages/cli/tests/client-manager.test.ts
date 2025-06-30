@@ -12,14 +12,16 @@ describe('ClientManager', () => {
   describe('detectInstalledClients', () => {
     it('should detect Claude Desktop when config exists', async () => {
       vol.fromJSON({
-        '/Users/test/Library/Application Support/Claude/claude_desktop_config.json': JSON.stringify({
-          mcpServers: {}
-        })
+        '/Users/test/Library/Application Support/Claude/claude_desktop_config.json': JSON.stringify(
+          {
+            mcpServers: {},
+          }
+        ),
       });
 
       const clients = await clientManager.detectInstalledClients();
-      const claudeClient = clients.find(c => c.type === 'claude-desktop');
-      
+      const claudeClient = clients.find((c) => c.type === 'claude-desktop');
+
       expect(claudeClient).toBeDefined();
       expect(claudeClient?.isInstalled).toBe(true);
       expect(claudeClient?.configPath).toContain('claude_desktop_config.json');
@@ -28,13 +30,13 @@ describe('ClientManager', () => {
     it('should detect Cursor when config exists', async () => {
       vol.fromJSON({
         '/Users/test/.cursor/mcp.json': JSON.stringify({
-          mcpServers: {}
-        })
+          mcpServers: {},
+        }),
       });
 
       const clients = await clientManager.detectInstalledClients();
-      const cursorClient = clients.find(c => c.type === 'cursor');
-      
+      const cursorClient = clients.find((c) => c.type === 'cursor');
+
       expect(cursorClient).toBeDefined();
       expect(cursorClient?.isInstalled).toBe(true);
       expect(cursorClient?.configPath).toContain('.cursor/mcp.json');
@@ -43,13 +45,13 @@ describe('ClientManager', () => {
     it('should detect Gemini when config exists', async () => {
       vol.fromJSON({
         '/Users/test/.gemini/settings.json': JSON.stringify({
-          mcpServers: {}
-        })
+          mcpServers: {},
+        }),
       });
 
       const clients = await clientManager.detectInstalledClients();
-      const geminiClient = clients.find(c => c.type === 'gemini');
-      
+      const geminiClient = clients.find((c) => c.type === 'gemini');
+
       expect(geminiClient).toBeDefined();
       expect(geminiClient?.isInstalled).toBe(true);
       expect(geminiClient?.configPath).toContain('.gemini/settings.json');
@@ -57,16 +59,16 @@ describe('ClientManager', () => {
 
     it('should not detect clients when no configs exist', async () => {
       const clients = await clientManager.detectInstalledClients();
-      
-      clients.forEach(client => {
+
+      clients.forEach((client) => {
         expect(client.isInstalled).toBe(false);
       });
     });
 
     it('should return all supported client types', async () => {
       const clients = await clientManager.detectInstalledClients();
-      const clientTypes = clients.map(c => c.type);
-      
+      const clientTypes = clients.map((c) => c.type);
+
       expect(clientTypes).toContain('claude-desktop');
       expect(clientTypes).toContain('cursor');
       expect(clientTypes).toContain('gemini');
@@ -80,11 +82,11 @@ describe('ClientManager', () => {
   describe('detectClient', () => {
     it('should detect specific client correctly', async () => {
       vol.fromJSON({
-        '/Users/test/.cursor/mcp.json': JSON.stringify({ mcpServers: {} })
+        '/Users/test/.cursor/mcp.json': JSON.stringify({ mcpServers: {} }),
       });
 
       const client = await clientManager.detectClient('cursor');
-      
+
       expect(client.type).toBe('cursor');
       expect(client.isInstalled).toBe(true);
       expect(client.name).toBe('Cursor');
@@ -92,7 +94,7 @@ describe('ClientManager', () => {
 
     it('should handle non-existent client type', async () => {
       const client = await clientManager.detectClient('invalid-client' as any);
-      
+
       expect(client.type).toBe('invalid-client');
       expect(client.isInstalled).toBe(false);
       expect(client.configPath).toBe('');
@@ -102,7 +104,7 @@ describe('ClientManager', () => {
   describe('utility methods', () => {
     it('should return supported clients', () => {
       const supportedClients = clientManager.getSupportedClients();
-      
+
       expect(Array.isArray(supportedClients)).toBe(true);
       expect(supportedClients.length).toBeGreaterThan(0);
       expect(supportedClients).toContain('cursor');
@@ -124,9 +126,14 @@ describe('ClientManager', () => {
       expect(geminiPath).toContain('.gemini/settings.json');
     });
 
+    it('should get config path for claude-code', () => {
+      const claudeCodePath = clientManager.getConfigPath('claude-code');
+      expect(claudeCodePath).toContain('.claude.json');
+    });
+
     it('should throw error for unsupported client config path', () => {
       expect(() => {
-        clientManager.getConfigPath('claude-code');
+        clientManager.getConfigPath('invalid-client' as any);
       }).toThrow();
     });
   });

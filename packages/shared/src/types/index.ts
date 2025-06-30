@@ -1,3 +1,24 @@
+export interface ServerParameter {
+  type:
+    | 'path'
+    | 'file_path'
+    | 'directory_path'
+    | 'api_key'
+    | 'string'
+    | 'number'
+    | 'boolean'
+    | 'url';
+  required: boolean;
+  description: string;
+  placeholder?: string;
+  validation?: {
+    pattern?: string;
+    minLength?: number;
+    maxLength?: number;
+  };
+  default?: string;
+}
+
 export interface MCPServer {
   id: string;
   name: string;
@@ -6,6 +27,7 @@ export interface MCPServer {
   type: 'stdio' | 'http';
   difficulty: 'simple' | 'medium' | 'advanced';
   requiresAuth: boolean;
+  parameters?: Record<string, ServerParameter>;
   installation: {
     command: string;
     args: string[];
@@ -24,7 +46,7 @@ export interface MCPServerConfig {
   args?: string[];
   env?: Record<string, string>;
   cwd?: string;
-  
+
   // Remote server configuration
   url?: string;
   type?: string;
@@ -49,7 +71,14 @@ export interface GeminiConfig extends ClientConfig {
   mcpServers: Record<string, MCPServerConfig>;
 }
 
-export type ClientType = 'claude-desktop' | 'cursor' | 'gemini' | 'claude-code' | 'vscode' | 'windsurf' | 'qodo-gen';
+export type ClientType =
+  | 'claude-desktop'
+  | 'cursor'
+  | 'gemini'
+  | 'claude-code'
+  | 'vscode'
+  | 'windsurf'
+  | 'qodo-gen';
 
 export interface ClientInfo {
   type: ClientType;
