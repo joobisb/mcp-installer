@@ -28,6 +28,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
 import ClientIcons from '@/components/ClientIcons';
+import MoreClientsIndicator from '@/components/MoreClientsIndicator';
+import BetaBadge from '@/components/ui/beta-badge';
 import { getServersData, type RegistryData, type MCPServer } from '@/lib/registry';
 
 const categoryIcons = {
@@ -200,18 +202,18 @@ const Index = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Top section with MCP Installer in top left and GitHub link in top right */}
             <div className="flex justify-between items-center mb-8">
-              <div className="relative">
+              <div className="relative flex items-center space-x-3">
                 <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-amber-700 via-orange-600 to-red-600 bg-clip-text text-transparent">
                   MCP Installer
                 </h1>
+                <BetaBadge showText={true} className="hidden sm:inline-flex" />
+                <BetaBadge showText={false} className="sm:hidden" />
               </div>
               <div className="flex items-center space-x-4">
                 <div className="hidden md:flex items-center space-x-3">
-                  <p className="text-sm text-amber-800">Supported Clients:</p>
+                  <p className="text-base font-medium text-amber-800">Supported Clients:</p>
                   <ClientIcons />
-                  <p className="text-sm text-amber-800 bg-white/40 px-2 py-1 rounded-full border border-orange-200/50 backdrop-blur-sm">
-                    & more 🔜
-                  </p>
+                  <MoreClientsIndicator />
                 </div>
                 <div className="flex items-center space-x-3">
                   <Button
