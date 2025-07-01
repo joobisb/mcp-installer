@@ -561,6 +561,295 @@
       "author": "Alibaba Cloud",
       "tags": ["alibaba-cloud", "mysql", "database", "analytics"],
       "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "adfin-mcp",
+      "name": "Adfin MCP Server",
+      "description": "Model Context Protocol Server for connecting with Adfin APIs",
+      "category": "utility",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "adfin_email": {
+          "type": "string",
+          "required": true,
+          "description": "Your Adfin account email"
+        },
+        "adfin_password": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your Adfin account password"
+        }
+      },
+      "installation": {
+        "command": "uvx",
+        "args": ["mcp-server-adfin"],
+        "env": {
+          "ADFIN_EMAIL": "{{adfin_email}}",
+          "ADFIN_PASSWORD": "{{adfin_password}}"
+        }
+      },
+      "documentation": "https://github.com/Adfin-Engineering/mcp-server-adfin",
+      "repository": "https://github.com/Adfin-Engineering/mcp-server-adfin",
+      "author": "Adfin Engineering",
+      "tags": ["adfin", "finance", "api"],
+      "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "alation-mcp",
+      "name": "Alation AI Agent SDK",
+      "description": "Data catalog integration for agentic experiences with Alation",
+      "category": "database",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "alation_url": {
+          "type": "url",
+          "required": true,
+          "description": "Your Alation instance URL"
+        },
+        "user_id": {
+          "type": "string",
+          "required": false,
+          "description": "User ID for user account authentication"
+        },
+        "refresh_token": {
+          "type": "api_key",
+          "required": false,
+          "description": "Refresh token for user account authentication"
+        },
+        "client_id": {
+          "type": "string",
+          "required": false,
+          "description": "Client ID for service account authentication"
+        },
+        "client_secret": {
+          "type": "api_key",
+          "required": false,
+          "description": "Client secret for service account authentication"
+        }
+      },
+      "installation": {
+        "command": "pip",
+        "args": ["install", "alation-ai-agent-mcp"]
+      },
+      "documentation": "https://github.com/Alation/alation-ai-agent-sdk",
+      "repository": "https://github.com/Alation/alation-ai-agent-sdk",
+      "author": "Alation",
+      "tags": ["data-catalog", "alation", "data-governance"],
+      "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "alpaca-mcp",
+      "name": "Alpaca Trading MCP",
+      "description": "Model Context Protocol server for Alpaca's Trading API with natural language trading capabilities",
+      "category": "utility",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "alpaca_api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your Alpaca API key (paper or live trading)"
+        },
+        "alpaca_secret_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your Alpaca secret key"
+        }
+      },
+      "installation": {
+        "command": "docker",
+        "args": [
+          "run",
+          "-it",
+          "--rm",
+          "-e",
+          "ALPACA_API_KEY={{alpaca_api_key}}",
+          "-e",
+          "ALPACA_SECRET_KEY={{alpaca_secret_key}}",
+          "ghcr.io/chand1012/alpaca-mcp-server:latest"
+        ]
+      },
+      "documentation": "https://github.com/alpacahq/alpaca-mcp-server",
+      "repository": "https://github.com/alpacahq/alpaca-mcp-server",
+      "author": "Alpaca",
+      "tags": ["trading", "finance", "stocks", "alpaca"],
+      "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "apify-actors",
+      "name": "Apify Actors MCP",
+      "description": "MCP server for Apify Actors enabling web scraping, search, and data extraction",
+      "category": "web",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": true,
+      "parameters": {
+        "apify_token": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your Apify API token from console.apify.com"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@apify/actors-mcp-server"],
+        "env": {
+          "APIFY_TOKEN": "{{apify_token}}"
+        }
+      },
+      "documentation": "https://github.com/apify/actors-mcp-server",
+      "repository": "https://github.com/apify/actors-mcp-server",
+      "author": "Apify",
+      "tags": ["web-scraping", "automation", "data-extraction", "apify"],
+      "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "apache-doris",
+      "name": "Apache Doris",
+      "description": "MCP Server for Apache Doris, an MPP-based real-time data warehouse",
+      "category": "database",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "doris_host": {
+          "type": "string",
+          "required": true,
+          "description": "Apache Doris host address",
+          "default": "127.0.0.1"
+        },
+        "doris_port": {
+          "type": "number",
+          "required": true,
+          "description": "Apache Doris port number",
+          "default": "9030"
+        },
+        "doris_user": {
+          "type": "string",
+          "required": true,
+          "description": "Apache Doris username",
+          "default": "root"
+        },
+        "doris_password": {
+          "type": "api_key",
+          "required": true,
+          "description": "Apache Doris password"
+        },
+        "token_secret": {
+          "type": "api_key",
+          "required": true,
+          "description": "Authentication token secret"
+        }
+      },
+      "installation": {
+        "command": "pip",
+        "args": ["install", "doris-mcp-server"],
+        "startupCommand": "doris-mcp-server --transport stdio",
+        "env": {
+          "DORIS_HOST": "{{doris_host}}",
+          "DORIS_PORT": "{{doris_port}}",
+          "DORIS_USER": "{{doris_user}}",
+          "DORIS_PASSWORD": "{{doris_password}}",
+          "AUTH_TYPE": "token",
+          "TOKEN_SECRET": "{{token_secret}}"
+        }
+      },
+      "documentation": "https://github.com/apache/doris-mcp-server",
+      "repository": "https://github.com/apache/doris-mcp-server",
+      "author": "Apache Software Foundation",
+      "tags": ["database", "analytics", "doris", "olap"],
+      "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "archbee",
+      "name": "Archbee",
+      "description": "Write and publish documentation that becomes the trusted source for instant answers with AI",
+      "category": "productivity",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": true,
+      "parameters": {
+        "api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Archbee API key from Space Settings"
+        },
+        "setup_method": {
+          "type": "select",
+          "required": true,
+          "description": "Choose your setup method",
+          "options": ["base_link", "space_id"],
+          "default": "base_link"
+        },
+        "api_base": {
+          "type": "url",
+          "required": false,
+          "description": "Your Archbee documentation base URL (when using base_link method)",
+          "placeholder": "https://your-docs.io/"
+        },
+        "space_id": {
+          "type": "string",
+          "required": false,
+          "description": "Your Archbee space ID (when using space_id method)"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@archbee/mcp"],
+        "env": {
+          "API_KEY": "{{api_key}}",
+          "API_BASE": "{{api_base}}",
+          "SPACE_ID": "{{space_id}}"
+        }
+      },
+      "documentation": "https://www.npmjs.com/package/@archbee/mcp",
+      "repository": "https://github.com/archbee-io/archbee-mcp",
+      "author": "Archbee",
+      "tags": ["documentation", "knowledge-base", "writing", "publishing"],
+      "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "arize-phoenix",
+      "name": "Arize Phoenix",
+      "description": "Inspect traces, manage prompts, curate datasets, and run experiments with Phoenix AI observability",
+      "category": "ai",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "phoenix_api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your Phoenix API key"
+        },
+        "phoenix_base_url": {
+          "type": "url",
+          "required": true,
+          "description": "Phoenix base URL",
+          "placeholder": "https://my-phoenix.com"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@arizeai/phoenix-mcp@latest",
+          "--baseUrl",
+          "{{phoenix_base_url}}",
+          "--apiKey",
+          "{{phoenix_api_key}}"
+        ]
+      },
+      "documentation": "https://github.com/Arize-ai/phoenix/tree/main/js/packages/phoenix-mcp",
+      "repository": "https://github.com/Arize-ai/phoenix",
+      "author": "Arize AI",
+      "tags": ["ai", "observability", "monitoring", "traces", "experiments"],
+      "validatedOn": "2025-01-01"
     }
   ]
 }
