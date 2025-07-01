@@ -27,13 +27,13 @@ mcp-installer list --available
 
 ## 🎯 Supported Clients
 
-| Client             | Status       | Config Location                                                   |
-| ------------------ | ------------ | ----------------------------------------------------------------- |
-| **Claude Desktop** | ✅ Supported | `~/Library/Application Support/Claude/claude_desktop_config.json` |
-| **Cursor**         | ✅ Supported | `~/.cursor/mcp.json`                                              |
-| **Gemini**         | ✅ Supported | `~/.gemini/settings.json`                                         |
-| **Claude Code**    | 🔄 Planned   | CLI managed                                                       |
-| **VS Code**        | 🔄 Planned   | Extension-specific                                                |
+| Client             | Status       |
+| ------------------ | ------------ |
+| **Claude Code**    | ✅ Supported |
+| **Cursor**         | ✅ Supported |
+| **Gemini**         | ✅ Supported |
+| **Claude Desktop** | ✅ Supported |
+| **VS Code**        | 🔄 Planned   |
 
 ## 📦 Available MCP Servers
 
