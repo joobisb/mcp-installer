@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2025-01-01T00:00:00Z",
+  "lastUpdated": "2025-01-01T14:00:00Z",
   "servers": [
     {
       "id": "playwright",
@@ -248,10 +248,11 @@
         }
       },
       "documentation": "https://developers.hubspot.com/mcp",
-      "repository": "https://github.com/HubSpot/mcp-server",
+      "repository": "https://developers.hubspot.com/mcp",
       "author": "HubSpot",
       "tags": ["hubspot", "crm"],
-      "validatedOn": "2024-12-28"
+      "validatedOn": "2025-01-01",
+      "notes": "Repository appears to be empty, using documentation URL as reference"
     },
     {
       "id": "honeycomb",
@@ -849,6 +850,359 @@
       "repository": "https://github.com/Arize-ai/phoenix",
       "author": "Arize AI",
       "tags": ["ai", "observability", "monitoring", "traces", "experiments"],
+      "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "everything",
+      "name": "Everything",
+      "description": "Reference / test server with prompts, resources, and tools",
+      "category": "development",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": false,
+      "installation": {
+        "command": "npx",
+        "args": ["@modelcontextprotocol/server-everything"]
+      },
+      "documentation": "https://github.com/modelcontextprotocol/servers/blob/main/src/everything",
+      "repository": "https://github.com/modelcontextprotocol/servers",
+      "author": "MCP Team",
+      "tags": ["reference", "testing", "development"],
+      "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "fetch",
+      "name": "Fetch",
+      "description": "Web content fetching and conversion for efficient LLM usage",
+      "category": "web",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": false,
+      "installation": {
+        "command": "uvx",
+        "args": ["mcp-server-fetch"]
+      },
+      "documentation": "https://github.com/modelcontextprotocol/servers/tree/main/src/fetch",
+      "repository": "https://github.com/modelcontextprotocol/servers",
+      "author": "MCP Team",
+      "tags": ["web", "content", "fetching"],
+      "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "time",
+      "name": "Time",
+      "description": "Time and timezone conversion capabilities",
+      "category": "utility",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": false,
+      "installation": {
+        "command": "uvx",
+        "args": ["mcp-server-time"]
+      },
+      "documentation": "https://github.com/modelcontextprotocol/servers/blob/main/src/time",
+      "repository": "https://github.com/modelcontextprotocol/servers",
+      "author": "MCP Team",
+      "tags": ["time", "timezone", "utility"],
+      "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "chroma",
+      "name": "Chroma",
+      "description": "Embeddings, vector search, document storage, and full-text search with the open-source AI application database",
+      "category": "database",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": false,
+      "installation": {
+        "command": "uvx",
+        "args": ["chroma-mcp"]
+      },
+      "documentation": "https://github.com/chroma-core/chroma-mcp",
+      "repository": "https://github.com/chroma-core/chroma-mcp",
+      "author": "Chroma",
+      "tags": ["vector", "embeddings", "search", "database"],
+      "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "bright-data",
+      "name": "Bright Data",
+      "description": "Discover, extract, and interact with the web - one interface powering automated access across the public internet",
+      "category": "web",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "bright_data_token": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your Bright Data API token"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["@brightdata/mcp"],
+        "env": {
+          "BRIGHT_DATA_TOKEN": "{{bright_data_token}}"
+        }
+      },
+      "documentation": "https://github.com/brightdata/brightdata-mcp",
+      "repository": "https://github.com/brightdata/brightdata-mcp",
+      "author": "Bright Data",
+      "tags": ["web-scraping", "data-extraction", "automation"],
+      "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "couchbase",
+      "name": "Couchbase",
+      "description": "Interact with the data stored in Couchbase clusters using natural language",
+      "category": "database",
+      "type": "stdio",
+      "difficulty": "complex",
+      "requiresAuth": true,
+      "parameters": {
+        "repository_path": {
+          "type": "directory_path",
+          "required": true,
+          "description": "Path to cloned couchbase MCP repository"
+        },
+        "couchbase_connection_string": {
+          "type": "string",
+          "required": true,
+          "description": "Couchbase cluster connection string"
+        },
+        "couchbase_username": {
+          "type": "string",
+          "required": true,
+          "description": "Couchbase username"
+        },
+        "couchbase_password": {
+          "type": "api_key",
+          "required": true,
+          "description": "Couchbase password"
+        },
+        "bucket_name": {
+          "type": "string",
+          "required": true,
+          "description": "Couchbase bucket name to use"
+        }
+      },
+      "installation": {
+        "command": "uv",
+        "args": [
+          "--directory",
+          "{{repository_path}}",
+          "run",
+          "src/mcp_server.py",
+          "--connection-string={{couchbase_connection_string}}",
+          "--username={{couchbase_username}}",
+          "--password={{couchbase_password}}",
+          "--bucket-name={{bucket_name}}",
+          "--read-only-query-mode=true"
+        ]
+      },
+      "documentation": "https://github.com/Couchbase-Ecosystem/mcp-server-couchbase",
+      "repository": "https://github.com/Couchbase-Ecosystem/mcp-server-couchbase",
+      "author": "Couchbase Ecosystem",
+      "tags": ["database", "nosql", "couchbase"],
+      "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "aiven",
+      "name": "Aiven",
+      "description": "Navigate your Aiven projects and interact with PostgreSQL, Apache Kafka, ClickHouse and OpenSearch services",
+      "category": "cloud-service",
+      "type": "stdio",
+      "difficulty": "complex",
+      "requiresAuth": true,
+      "parameters": {
+        "aiven_token": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your Aiven API token"
+        },
+        "repository_path": {
+          "type": "directory_path",
+          "required": true,
+          "description": "Path to cloned aiven-mcp repository"
+        }
+      },
+      "installation": {
+        "command": "uv",
+        "args": [
+          "--directory",
+          "{{repository_path}}",
+          "run",
+          "--with-editable",
+          "{{repository_path}}",
+          "--python",
+          "3.13",
+          "mcp-aiven"
+        ],
+        "env": {
+          "AIVEN_BASE_URL": "https://api.aiven.io",
+          "AIVEN_TOKEN": "{{aiven_token}}"
+        }
+      },
+      "documentation": "https://github.com/Aiven-Open/mcp-aiven",
+      "repository": "https://github.com/Aiven-Open/mcp-aiven",
+      "author": "Aiven",
+      "tags": ["cloud", "database", "kafka", "opensearch"],
+      "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "alapi",
+      "name": "ALAPI",
+      "description": "ALAPI MCP Tools, Call hundreds of API interfaces via MCP",
+      "category": "development",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": true,
+      "parameters": {
+        "alapi_token": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your ALAPI token"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@smithery/cli", "install", "@ALAPI-SDK/mcp-alapi-cn", "--client", "claude"],
+        "env": {
+          "ALAPI_TOKEN": "{{alapi_token}}"
+        }
+      },
+      "documentation": "https://github.com/ALAPI-SDK/mcp-alapi-cn",
+      "repository": "https://github.com/ALAPI-SDK/mcp-alapi-cn",
+      "author": "ALAPI SDK",
+      "tags": ["api", "tools", "utilities"],
+      "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "alibaba-cloud-devops",
+      "name": "Alibaba Cloud DevOps",
+      "description": "Yunxiao MCP Server for Yun services providing AI assistants with DevOps capabilities",
+      "category": "cloud-service",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "access_token": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your Yunxiao platform access token"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@smithery/cli",
+          "install",
+          "@aliyun/alibabacloud-devops-mcp-server",
+          "--client",
+          "claude"
+        ],
+        "env": {
+          "ACCESS_TOKEN": "{{access_token}}"
+        }
+      },
+      "documentation": "https://github.com/aliyun/alibabacloud-devops-mcp-server",
+      "repository": "https://github.com/aliyun/alibabacloud-devops-mcp-server",
+      "author": "Alibaba Cloud",
+      "tags": ["devops", "cloud", "alibaba", "yunxiao"],
+      "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "elevenlabs",
+      "name": "ElevenLabs",
+      "description": "Text-to-speech and voice generation platform integration",
+      "category": "ai",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": true,
+      "parameters": {
+        "elevenlabs_api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your ElevenLabs API key"
+        }
+      },
+      "installation": {
+        "command": "uvx",
+        "args": ["elevenlabs-mcp"],
+        "env": {
+          "ELEVENLABS_API_KEY": "{{elevenlabs_api_key}}"
+        }
+      },
+      "documentation": "https://github.com/elevenlabs/elevenlabs-mcp",
+      "repository": "https://github.com/elevenlabs/elevenlabs-mcp",
+      "author": "ElevenLabs",
+      "tags": ["ai", "voice", "tts", "audio"],
+      "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "magic-mcp",
+      "name": "21st.dev Magic",
+      "description": "Create crafted UI components inspired by the best 21st.dev design engineers",
+      "category": "development",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "magic_api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your 21st.dev Magic API key"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["@21st-dev/cli@latest", "install", "claude", "--api-key", "{{magic_api_key}}"]
+      },
+      "documentation": "https://github.com/21st-dev/magic-mcp",
+      "repository": "https://github.com/21st-dev/magic-mcp",
+      "author": "21st.dev",
+      "tags": ["ui", "components", "design", "development"],
+      "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "adfin-payments",
+      "name": "Adfin",
+      "description": "The only platform you need to get paid - all payments in one place, invoicing and accounting reconciliations",
+      "category": "productivity",
+      "type": "stdio",
+      "difficulty": "complex",
+      "requiresAuth": true,
+      "parameters": {
+        "adfin_email": {
+          "type": "string",
+          "required": true,
+          "description": "Your Adfin account email"
+        },
+        "adfin_password": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your Adfin account password"
+        },
+        "repository_path": {
+          "type": "directory_path",
+          "required": true,
+          "description": "Absolute path to cloned adfin-mcp repository"
+        }
+      },
+      "installation": {
+        "command": "uv",
+        "args": ["--directory", "{{repository_path}}", "run", "main_adfin_mcp.py"],
+        "env": {
+          "ADFIN_EMAIL": "{{adfin_email}}",
+          "ADFIN_PASSWORD": "{{adfin_password}}"
+        }
+      },
+      "documentation": "https://github.com/Adfin-Engineering/mcp-server-adfin",
+      "repository": "https://github.com/Adfin-Engineering/mcp-server-adfin",
+      "author": "Adfin Engineering",
+      "tags": ["payments", "invoicing", "accounting", "finance"],
       "validatedOn": "2025-01-01"
     }
   ]

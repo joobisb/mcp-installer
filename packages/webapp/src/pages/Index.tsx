@@ -470,11 +470,6 @@ const Index = () => {
                   </Button>
                 </div>
               )}
-
-              <p className="text-xs text-gray-500 mt-2">
-                Debug: filteredServers.length = {filteredServers.length}, serversData.servers.length
-                = {serversData?.servers?.length || 0}
-              </p>
             </div>
           </div>
         )}
