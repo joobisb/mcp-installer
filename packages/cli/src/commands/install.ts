@@ -42,7 +42,9 @@ export async function installCommand(serverName: string, options: InstallOptions
 
       if (targetClients.length === 0) {
         spinner.fail(chalk.red('No supported AI clients detected'));
-        console.log(chalk.yellow('\nSupported clients: Claude Desktop, Cursor, Gemini'));
+        console.log(
+          chalk.yellow('\nSupported clients: Claude Desktop, Claude Code, Cursor, Gemini')
+        );
         console.log(chalk.yellow('Please install at least one client and try again.'));
         return;
       }
@@ -56,9 +58,6 @@ export async function installCommand(serverName: string, options: InstallOptions
         'claude-desktop': 'claude-desktop',
         cursor: 'cursor',
         gemini: 'gemini',
-        vscode: 'vscode',
-        windsurf: 'windsurf',
-        'qodo-gen': 'qodo-gen',
       };
 
       for (const requestedClient of requestedClients) {
@@ -66,11 +65,7 @@ export async function installCommand(serverName: string, options: InstallOptions
 
         if (!clientManager.isClientSupported(clientType)) {
           spinner.fail(chalk.red(`Unsupported client: ${requestedClient}`));
-          console.log(
-            chalk.yellow(
-              `Supported clients: claude, claude-desktop, cursor, gemini, vscode, windsurf, qodo-gen`
-            )
-          );
+          console.log(chalk.yellow(`Supported clients: claude, claude-desktop, cursor, gemini`));
           return;
         }
 

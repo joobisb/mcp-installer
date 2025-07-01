@@ -3,12 +3,9 @@ import { ClientType } from '../types/index.js';
 export function getClientDisplayName(type: ClientType): string {
   const displayNames: Record<ClientType, string> = {
     'claude-desktop': 'Claude Desktop',
-    'cursor': 'Cursor',
-    'gemini': 'Gemini',
+    cursor: 'Cursor',
+    gemini: 'Gemini',
     'claude-code': 'Claude Code',
-    'vscode': 'VS Code',
-    'windsurf': 'Windsurf',
-    'qodo-gen': 'Qodo Gen',
   };
   return displayNames[type] || type;
 }

@@ -23,34 +23,19 @@ export class ClientManager {
     cursor: {
       name: 'Cursor',
       configPaths: [join(homedir(), '.cursor', 'mcp.json')],
+      detectCommand: 'cursor',
     },
     gemini: {
       name: 'Gemini',
-      configPaths: [join(homedir(), '.gemini', 'settings.json')],
+      configPaths: [join(homedir(), '.gemini', 'settings.json')], //TODO: Verify for linux and Windows
+      detectCommand: 'gemini',
     },
     'claude-code': {
       name: 'Claude Code',
       configPaths: [
-        join(homedir(), '.claude.json'), // Global configuration
+        join(homedir(), '.claude.json'), // Global configuration TODO: Verify for linux and Windows
       ],
       detectCommand: 'claude',
-    },
-    vscode: {
-      name: 'VS Code',
-      configPaths: [
-        join(homedir(), '.vscode', 'extensions'),
-        join(homedir(), 'Library', 'Application Support', 'Code', 'User'), // macOS
-        join(homedir(), '.config', 'Code', 'User'), // Linux
-        join(homedir(), 'AppData', 'Roaming', 'Code', 'User'), // Windows
-      ],
-    },
-    windsurf: {
-      name: 'Windsurf',
-      configPaths: [join(homedir(), '.windsurf', 'settings.json')],
-    },
-    'qodo-gen': {
-      name: 'Qodo Gen',
-      configPaths: [],
     },
   };
 
@@ -80,21 +65,25 @@ export class ClientManager {
 
     let configPath = '';
     let isInstalled = false;
+    let configExists = false;
 
+    // Check if config file exists
     if (config.configPaths.length > 0) {
       for (const path of config.configPaths) {
         if (existsSync(path)) {
           configPath = path;
-          isInstalled = true;
+          configExists = true;
           break;
         }
       }
 
-      if (!isInstalled && config.configPaths.length > 0) {
+      // Always set configPath to the primary path
+      if (!configPath && config.configPaths.length > 0) {
         configPath = config.configPaths[0];
       }
     }
 
+    // Check if app is installed via command
     if (config.detectCommand) {
       try {
         const { execSync } = await import('child_process');
@@ -103,6 +92,11 @@ export class ClientManager {
       } catch {
         // Command not found
       }
+    }
+
+    // Fallback: if config exists, assume app is installed
+    if (!isInstalled && configExists) {
+      isInstalled = true;
     }
 
     return {

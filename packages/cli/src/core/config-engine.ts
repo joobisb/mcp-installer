@@ -44,6 +44,37 @@ export class ConfigEngine {
       const content = JSON.stringify(config, null, 2);
       await writeFile(configPath, content, 'utf-8');
     } catch (error) {
+      if (error instanceof Error) {
+        // Check for permission errors
+        if (error.message.includes('EACCES') || error.message.includes('permission denied')) {
+          const clientType = this.inferClientFromPath(configPath);
+          const clientName = this.getClientDisplayName(clientType);
+
+          throw new Error(
+            `Permission denied when writing to ${configPath}.\n\n` +
+              `This typically happens when the ${clientName} config file is protected.\n` +
+              `Try running the command with sudo:\n` +
+              `  sudo mcp-installer install <server-name> --clients=${clientType}\n\n` +
+              `Or manually change the file permissions:\n` +
+              `  sudo chmod 644 ${configPath}\n` +
+              `  sudo chown $USER ${configPath}`
+          );
+        }
+
+        // Check for directory permission errors
+        if (error.message.includes('ENOENT') && error.message.includes('mkdir')) {
+          const dirPath = dirname(configPath);
+          throw new Error(
+            `Cannot create directory ${dirPath}.\n\n` +
+              `Try creating the directory manually:\n` +
+              `  mkdir -p ${dirPath}\n\n` +
+              `Or run with sudo if needed:\n` +
+              `  sudo mkdir -p ${dirPath}\n` +
+              `  sudo chown $USER ${dirPath}`
+          );
+        }
+      }
+
       throw new Error(
         `Failed to write config to ${configPath}: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
@@ -235,9 +266,17 @@ export class ConfigEngine {
     if (configPath.includes('.gemini')) return 'gemini';
     if (configPath.includes('.claude.json')) return 'claude-code';
     if (configPath.includes('Claude')) return 'claude-desktop';
-    if (configPath.includes('.vscode') || configPath.includes('Code')) return 'vscode';
-    if (configPath.includes('.windsurf')) return 'windsurf';
     return 'claude-desktop'; // default
+  }
+
+  private getClientDisplayName(type: ClientType): string {
+    const displayNames: Record<ClientType, string> = {
+      'claude-desktop': 'Claude Desktop',
+      cursor: 'Cursor',
+      gemini: 'Gemini',
+      'claude-code': 'Claude Code',
+    };
+    return displayNames[type] || type;
   }
 
   private inferOriginalPath(_backupPath: string): string {

@@ -73,9 +73,6 @@ describe('ClientManager', () => {
       expect(clientTypes).toContain('cursor');
       expect(clientTypes).toContain('gemini');
       expect(clientTypes).toContain('claude-code');
-      expect(clientTypes).toContain('vscode');
-      expect(clientTypes).toContain('windsurf');
-      expect(clientTypes).toContain('qodo-gen');
     });
   });
 

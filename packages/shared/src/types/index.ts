@@ -71,14 +71,7 @@ export interface GeminiConfig extends ClientConfig {
   mcpServers: Record<string, MCPServerConfig>;
 }
 
-export type ClientType =
-  | 'claude-desktop'
-  | 'cursor'
-  | 'gemini'
-  | 'claude-code'
-  | 'vscode'
-  | 'windsurf'
-  | 'qodo-gen';
+export type ClientType = 'claude-desktop' | 'cursor' | 'gemini' | 'claude-code';
 
 export interface ClientInfo {
   type: ClientType;
