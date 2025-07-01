@@ -252,7 +252,7 @@ const Index = () => {
                 {/* Subtitle with glass effect */}
                 <div className="backdrop-blur-sm bg-white/40 px-6 py-5 rounded-2xl border border-orange-200/50 shadow-lg">
                   <p className="text-lg md:text-xl text-amber-800 font-medium leading-relaxed mb-2">
-                    Search your server and copy install commands with one-click simplicity!
+                    Search your MCP server and copy install commands with one-click simplicity!
                   </p>
                   <p className="text-base md:text-lg text-amber-700 font-normal">
                     Effortless server setup for all your AI clients
