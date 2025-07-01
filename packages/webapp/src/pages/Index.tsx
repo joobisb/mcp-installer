@@ -12,6 +12,7 @@ import {
   Check,
   Github,
   Loader2,
+  Plus,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,6 +31,7 @@ import { useToast } from '@/hooks/use-toast';
 import ClientIcons from '@/components/ClientIcons';
 import MoreClientsIndicator from '@/components/MoreClientsIndicator';
 import BetaBadge from '@/components/ui/beta-badge';
+import ServerRequestFAB from '@/components/ServerRequestFAB';
 import { getServersData, type RegistryData, type MCPServer } from '@/lib/registry';
 
 const categoryIcons = {
@@ -440,10 +442,35 @@ const Index = () => {
 
         {filteredServers.length === 0 && serversData && (
           <div className="text-center py-12">
-            <div className="backdrop-blur-md bg-white/60 rounded-2xl p-8 border border-orange-200/50 shadow-xl inline-block">
+            <div className="backdrop-blur-md bg-white/60 rounded-2xl p-8 border border-orange-200/50 shadow-xl inline-block max-w-md">
               <Package className="h-16 w-16 text-amber-400 mx-auto mb-4" />
               <h3 className="text-xl font-medium text-amber-700 mb-2">No servers found</h3>
-              <p className="text-amber-600">Try adjusting your search query or category filter.</p>
+              <p className="text-amber-600 mb-4">
+                Try adjusting your search query or category filter.
+              </p>
+
+              {searchQuery && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                  <p className="text-sm text-blue-700 mb-3">
+                    Can't find "<span className="font-medium">{searchQuery}</span>"?
+                  </p>
+                  <Button
+                    onClick={() => {
+                      // Find and trigger the FAB modal
+                      const event = new CustomEvent('openServerRequest', {
+                        detail: { serverName: searchQuery },
+                      });
+                      window.dispatchEvent(event);
+                    }}
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Request This Server
+                  </Button>
+                </div>
+              )}
+
               <p className="text-xs text-gray-500 mt-2">
                 Debug: filteredServers.length = {filteredServers.length}, serversData.servers.length
                 = {serversData?.servers?.length || 0}
@@ -737,6 +764,9 @@ const Index = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Floating Action Button for Server Requests */}
+      <ServerRequestFAB />
     </div>
   );
 };
