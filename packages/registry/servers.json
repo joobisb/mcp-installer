@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2024-12-28T00:00:00Z",
+  "lastUpdated": "2025-01-01T00:00:00Z",
   "servers": [
     {
       "id": "playwright",
@@ -426,6 +426,141 @@
       "author": "crystaldba",
       "tags": ["postgres", "database", "sql"],
       "validatedOn": "2024-12-28"
+    },
+    {
+      "id": "agentql-mcp",
+      "name": "AgentQL MCP",
+      "description": "Web data extraction using AgentQL's data extraction capabilities",
+      "category": "web",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": true,
+      "parameters": {
+        "agentql_api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "AgentQL API key from Dev Portal"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "agentql-mcp"],
+        "env": {
+          "AGENTQL_API_KEY": "{{agentql_api_key}}"
+        }
+      },
+      "documentation": "https://github.com/tinyfish-io/agentql-mcp",
+      "repository": "https://github.com/tinyfish-io/agentql-mcp",
+      "author": "TinyFish.io",
+      "tags": ["web", "scraping", "data-extraction"],
+      "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "agentrpc",
+      "name": "AgentRPC MCP",
+      "description": "MCP server for connecting AI agents with registered tools across networks",
+      "category": "ai",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "api_secret": {
+          "type": "api_key",
+          "required": true,
+          "description": "AgentRPC API secret"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["agentrpc", "mcp"],
+        "env": {
+          "AGENTRPC_API_SECRET": "{{api_secret}}"
+        }
+      },
+      "documentation": "https://github.com/agentrpc/agentrpc",
+      "repository": "https://github.com/agentrpc/agentrpc",
+      "author": "AgentRPC",
+      "tags": ["ai", "rpc", "agents"],
+      "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "agentset-mcp",
+      "name": "AgentSet MCP",
+      "description": "RAG platform for building document-based AI applications",
+      "category": "ai",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "AgentSet API key"
+        },
+        "namespace_id": {
+          "type": "string",
+          "required": true,
+          "description": "Your AgentSet namespace ID"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["@agentset/mcp", "--ns", "{{namespace_id}}"],
+        "env": {
+          "AGENTSET_API_KEY": "{{api_key}}"
+        }
+      },
+      "documentation": "https://github.com/agentset-ai/mcp-server",
+      "repository": "https://github.com/agentset-ai/mcp-server",
+      "author": "AgentSet AI",
+      "tags": ["ai", "rag", "documents"],
+      "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "adb-mysql-mcp",
+      "name": "Alibaba Cloud ADB MySQL",
+      "description": "AnalyticDB for MySQL database interface for AI agents",
+      "category": "database",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "host": {
+          "type": "string",
+          "required": true,
+          "description": "Database host address"
+        },
+        "port": {
+          "type": "number",
+          "required": true,
+          "description": "Database port number",
+          "default": "3306"
+        },
+        "database": {
+          "type": "string",
+          "required": true,
+          "description": "Database name"
+        },
+        "username": {
+          "type": "string",
+          "required": true,
+          "description": "Database username"
+        },
+        "password": {
+          "type": "api_key",
+          "required": true,
+          "description": "Database password"
+        }
+      },
+      "installation": {
+        "command": "pip",
+        "args": ["install", "adb-mysql-mcp-server"]
+      },
+      "documentation": "https://github.com/aliyun/alibabacloud-adb-mysql-mcp-server",
+      "repository": "https://github.com/aliyun/alibabacloud-adb-mysql-mcp-server",
+      "author": "Alibaba Cloud",
+      "tags": ["alibaba-cloud", "mysql", "database", "analytics"],
+      "validatedOn": "2025-01-01"
     }
   ]
 }
