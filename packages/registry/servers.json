@@ -1,7 +1,144 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2025-01-01T14:00:00Z",
+  "lastUpdated": "2025-01-02T16:00:00Z",
   "servers": [
+    {
+      "id": "postgres",
+      "name": "Postgres MCP Pro",
+      "description": "Connect to and query PostgreSQL databases.",
+      "category": "database",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "database_uri": {
+          "type": "string",
+          "required": true,
+          "description": "PostgreSQL connection URI"
+        }
+      },
+      "installation": {
+        "command": "docker",
+        "args": [
+          "run",
+          "-i",
+          "--rm",
+          "-e",
+          "DATABASE_URI",
+          "crystaldba/postgres-mcp",
+          "--access-mode=unrestricted"
+        ],
+        "env": {
+          "DATABASE_URI": "{{database_uri}}"
+        }
+      },
+      "documentation": "https://github.com/crystaldba/postgres-mcp",
+      "repository": "https://github.com/crystaldba/postgres-mcp",
+      "author": "crystaldba",
+      "tags": ["postgres", "database", "sql"],
+      "validatedOn": "2024-12-28"
+    },
+    {
+      "id": "aws-bedrock-kb",
+      "name": "AWS Bedrock KB Retrieval",
+      "description": "Query Amazon Bedrock Knowledge Bases using natural language to retrieve relevant information from your data sources",
+      "category": "ai",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "aws_profile": {
+          "type": "string",
+          "required": true,
+          "description": "AWS profile name"
+        },
+        "aws_region": {
+          "type": "string",
+          "required": true,
+          "description": "AWS region",
+          "default": "us-east-1"
+        }
+      },
+      "installation": {
+        "command": "uvx",
+        "args": ["awslabs.bedrock-kb-retrieval-mcp-server@latest"],
+        "env": {
+          "AWS_PROFILE": "{{aws_profile}}",
+          "AWS_REGION": "{{aws_region}}"
+        }
+      },
+      "documentation": "https://github.com/awslabs/mcp/tree/main/src/bedrock-kb-retrieval-mcp-server",
+      "repository": "https://github.com/awslabs/mcp",
+      "author": "AWS Labs",
+      "tags": ["aws", "bedrock", "knowledge-base", "ai"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "supabase",
+      "name": "Supabase",
+      "description": "Interact with Supabase projects.",
+      "category": "database",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "supabase_access_token": {
+          "type": "api_key",
+          "required": true,
+          "description": "Supabase Personal Access Token"
+        },
+        "project_ref": {
+          "type": "string",
+          "required": true,
+          "description": "Your Supabase project reference"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@supabase/mcp-server-supabase@latest",
+          "--read-only",
+          "--project-ref={{project_ref}}"
+        ],
+        "env": {
+          "SUPABASE_ACCESS_TOKEN": "{{supabase_access_token}}"
+        }
+      },
+      "documentation": "https://github.com/supabase-community/supabase-mcp",
+      "repository": "https://github.com/supabase-community/supabase-mcp",
+      "author": "Supabase Community",
+      "tags": ["supabase", "database", "postgres"],
+      "validatedOn": "2024-12-28"
+    },
+    {
+      "id": "elevenlabs",
+      "name": "ElevenLabs",
+      "description": "Text-to-speech and voice generation platform integration",
+      "category": "ai",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": true,
+      "parameters": {
+        "elevenlabs_api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your ElevenLabs API key"
+        }
+      },
+      "installation": {
+        "command": "uvx",
+        "args": ["elevenlabs-mcp"],
+        "env": {
+          "ELEVENLABS_API_KEY": "{{elevenlabs_api_key}}"
+        }
+      },
+      "documentation": "https://github.com/elevenlabs/elevenlabs-mcp",
+      "repository": "https://github.com/elevenlabs/elevenlabs-mcp",
+      "author": "ElevenLabs",
+      "tags": ["ai", "voice", "tts", "audio"],
+      "validatedOn": "2025-01-01"
+    },
     {
       "id": "playwright",
       "name": "Playwright",
@@ -19,6 +156,24 @@
       "tags": ["browser", "automation", "testing", "scraping"],
       "author": "Microsoft",
       "validatedOn": "2024-12-28"
+    },
+    {
+      "id": "context7",
+      "name": "Context7",
+      "description": "Up-to-date documentation for any Cursor prompt - provides current code context in AI coding environments",
+      "category": "development",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": false,
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@upstash/context7-mcp@latest"]
+      },
+      "documentation": "https://github.com/upstash/context7-mcp",
+      "repository": "https://github.com/upstash/context7-mcp",
+      "author": "Upstash",
+      "tags": ["documentation", "context", "coding", "cursor", "ai"],
+      "validatedOn": "2025-01-02"
     },
     {
       "id": "filesystem",
@@ -355,77 +510,6 @@
       "repository": "https://github.com/cloudflare/mcp-server-cloudflare",
       "author": "Cloudflare",
       "tags": ["cloudflare", "bindings", "development"],
-      "validatedOn": "2024-12-28"
-    },
-    {
-      "id": "supabase",
-      "name": "Supabase",
-      "description": "Interact with Supabase projects.",
-      "category": "database",
-      "type": "stdio",
-      "difficulty": "medium",
-      "requiresAuth": true,
-      "parameters": {
-        "supabase_access_token": {
-          "type": "api_key",
-          "required": true,
-          "description": "Supabase Personal Access Token"
-        },
-        "project_ref": {
-          "type": "string",
-          "required": true,
-          "description": "Your Supabase project reference"
-        }
-      },
-      "installation": {
-        "command": "npx",
-        "args": [
-          "-y",
-          "@supabase/mcp-server-supabase@latest",
-          "--read-only",
-          "--project-ref={{project_ref}}"
-        ],
-        "env": {
-          "SUPABASE_ACCESS_TOKEN": "{{supabase_access_token}}"
-        }
-      },
-      "documentation": "https://github.com/supabase-community/supabase-mcp",
-      "repository": "https://github.com/supabase-community/supabase-mcp",
-      "author": "Supabase Community",
-      "tags": ["supabase", "database", "postgres"],
-      "validatedOn": "2024-12-28"
-    },
-    {
-      "id": "postgres",
-      "name": "PostgreSQL",
-      "description": "Connect to and query PostgreSQL databases.",
-      "category": "database",
-      "type": "stdio",
-      "difficulty": "medium",
-      "requiresAuth": true,
-      "parameters": {
-        "database_uri": {
-          "type": "string",
-          "required": true,
-          "description": "PostgreSQL connection URI"
-        }
-      },
-      "installation": {
-        "command": "docker",
-        "args": [
-          "run",
-          "-i",
-          "--rm",
-          "-e",
-          "DATABASE_URI={{database_uri}}",
-          "crystaldba/postgres-mcp",
-          "--access-mode=unrestricted"
-        ]
-      },
-      "documentation": "https://github.com/crystaldba/postgres-mcp",
-      "repository": "https://github.com/crystaldba/postgres-mcp",
-      "author": "crystaldba",
-      "tags": ["postgres", "database", "sql"],
       "validatedOn": "2024-12-28"
     },
     {
@@ -1113,34 +1197,6 @@
       "validatedOn": "2025-01-01"
     },
     {
-      "id": "elevenlabs",
-      "name": "ElevenLabs",
-      "description": "Text-to-speech and voice generation platform integration",
-      "category": "ai",
-      "type": "stdio",
-      "difficulty": "simple",
-      "requiresAuth": true,
-      "parameters": {
-        "elevenlabs_api_key": {
-          "type": "api_key",
-          "required": true,
-          "description": "Your ElevenLabs API key"
-        }
-      },
-      "installation": {
-        "command": "uvx",
-        "args": ["elevenlabs-mcp"],
-        "env": {
-          "ELEVENLABS_API_KEY": "{{elevenlabs_api_key}}"
-        }
-      },
-      "documentation": "https://github.com/elevenlabs/elevenlabs-mcp",
-      "repository": "https://github.com/elevenlabs/elevenlabs-mcp",
-      "author": "ElevenLabs",
-      "tags": ["ai", "voice", "tts", "audio"],
-      "validatedOn": "2025-01-01"
-    },
-    {
       "id": "magic-mcp",
       "name": "21st.dev Magic",
       "description": "Create crafted UI components inspired by the best 21st.dev design engineers",
@@ -1203,6 +1259,896 @@
       "author": "Adfin Engineering",
       "tags": ["payments", "invoicing", "accounting", "finance"],
       "validatedOn": "2025-01-01"
+    },
+    {
+      "id": "allyson-mcp",
+      "name": "Allyson",
+      "description": "AI-powered SVG animation generator that transforms static files into animated SVG components",
+      "category": "development",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": true,
+      "parameters": {
+        "allyson_api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your Allyson API key from the platform"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["allyson-mcp", "--api-key", "{{allyson_api_key}}"]
+      },
+      "documentation": "https://github.com/isaiahbjork/allyson-mcp",
+      "repository": "https://github.com/isaiahbjork/allyson-mcp",
+      "author": "Isaiah Bjork",
+      "tags": ["svg", "animation", "ai", "design"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "allvoicelab-mcp",
+      "name": "AllVoiceLab",
+      "description": "An AI voice toolkit with TTS, voice cloning, and video translation capabilities",
+      "category": "ai",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "allvoicelab_api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your AllVoiceLab API key"
+        },
+        "domain": {
+          "type": "string",
+          "required": true,
+          "description": "Your AllVoiceLab domain"
+        }
+      },
+      "installation": {
+        "command": "uvx",
+        "args": ["allvoicelab-mcp"],
+        "env": {
+          "ALLVOICELAB_API_KEY": "{{allvoicelab_api_key}}",
+          "ALLVOICELAB_DOMAIN": "{{domain}}"
+        }
+      },
+      "documentation": "https://www.allvoicelab.com/mcp",
+      "repository": "https://github.com/allvoicelab/AllVoiceLab-MCP",
+      "author": "AllVoiceLab",
+      "tags": ["voice", "tts", "ai", "cloning", "translation"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "alapi-mcp",
+      "name": "ALAPI",
+      "description": "ALAPI MCP Tools - Call hundreds of API interfaces via MCP",
+      "category": "utility",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "alapi_token": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your ALAPI token from the platform"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@smithery/cli", "install", "@ALAPI-SDK/mcp-alapi-cn", "--client", "claude"],
+        "env": {
+          "ALAPI_TOKEN": "{{alapi_token}}"
+        }
+      },
+      "documentation": "https://github.com/ALAPI-SDK/mcp-alapi-cn",
+      "repository": "https://github.com/ALAPI-SDK/mcp-alapi-cn",
+      "author": "ALAPI SDK",
+      "tags": ["api", "tools", "utilities", "integration"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "alibaba-devops-mcp",
+      "name": "AlibabaCloud DevOps",
+      "description": "Yunxiao MCP Server providing AI assistants with the ability to interact with the Yunxiao platform",
+      "category": "cloud-service",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "yunxiao_access_token": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your Yunxiao platform access token"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "alibabacloud-devops-mcp-server"],
+        "env": {
+          "ACCESS_TOKEN": "{{yunxiao_access_token}}"
+        }
+      },
+      "documentation": "https://github.com/aliyun/alibabacloud-devops-mcp-server",
+      "repository": "https://github.com/aliyun/alibabacloud-devops-mcp-server",
+      "author": "Alibaba Cloud",
+      "tags": ["devops", "cloud", "alibaba", "yunxiao"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "apify-actors-mcp",
+      "name": "Apify Actors MCP",
+      "description": "Use 3,000+ pre-built cloud tools to extract data from websites, e-commerce, social media, search engines, maps, and more",
+      "category": "web",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": true,
+      "parameters": {
+        "apify_token": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your Apify API token from console.apify.com"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@apify/actors-mcp-server"],
+        "env": {
+          "APIFY_TOKEN": "{{apify_token}}"
+        }
+      },
+      "documentation": "https://github.com/apify/actors-mcp-server",
+      "repository": "https://github.com/apify/actors-mcp-server",
+      "author": "Apify",
+      "tags": ["web-scraping", "automation", "data-extraction"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "atla-mcp",
+      "name": "Atla",
+      "description": "Enable AI agents to interact with the Atla API for state-of-the-art LLM evaluation",
+      "category": "ai",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": true,
+      "parameters": {
+        "atla_api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your Atla API key"
+        }
+      },
+      "installation": {
+        "command": "uvx",
+        "args": ["atla-mcp-server"],
+        "env": {
+          "ATLA_API_KEY": "{{atla_api_key}}"
+        }
+      },
+      "documentation": "https://github.com/atla-ai/atla-mcp-server",
+      "repository": "https://github.com/atla-ai/atla-mcp-server",
+      "author": "Atla AI",
+      "tags": ["ai", "evaluation", "llm"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "armor-crypto-mcp",
+      "name": "Armor Crypto MCP",
+      "description": "MCP to interface with multiple blockchains, staking, DeFi, swap, bridging, wallet management, DCA, Limit Orders, Coin Lookup, Tracking and more",
+      "category": "utility",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "armor_api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your Armor API key (requires Armor NFT)"
+        }
+      },
+      "installation": {
+        "command": "uvx",
+        "args": ["armor-crypto-mcp@latest"],
+        "env": {
+          "ARMOR_API_KEY": "{{armor_api_key}}"
+        }
+      },
+      "documentation": "https://github.com/armorwallet/armor-crypto-mcp",
+      "repository": "https://github.com/armorwallet/armor-crypto-mcp",
+      "author": "Armor Wallet",
+      "tags": ["crypto", "blockchain", "defi", "wallet"],
+      "validatedOn": "2025-01-02",
+      "notes": "Pre-alpha version, requires Armor NFT for API key"
+    },
+    {
+      "id": "aws-cdk-mcp",
+      "name": "AWS CDK",
+      "description": "Get prescriptive CDK advice, explain CDK Nag rules, check suppressions, generate Bedrock Agent schemas, and discover AWS Solutions Constructs patterns",
+      "category": "development",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": false,
+      "installation": {
+        "command": "uvx",
+        "args": ["awslabs.cdk-mcp-server@latest"]
+      },
+      "documentation": "https://github.com/awslabs/mcp/tree/main/src/cdk-mcp-server",
+      "repository": "https://github.com/awslabs/mcp",
+      "author": "AWS Labs",
+      "tags": ["aws", "cdk", "infrastructure", "development"],
+      "validatedOn": "2025-01-02",
+      "notes": "Requires AWS CDK CLI (npm install -g aws-cdk) for full functionality"
+    },
+    {
+      "id": "aws-core-mcp",
+      "name": "AWS Core",
+      "description": "Core AWS MCP server providing prompt understanding and server management capabilities",
+      "category": "ai",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "aws_profile": {
+          "type": "string",
+          "required": true,
+          "description": "AWS profile name with Bedrock access"
+        },
+        "aws_region": {
+          "type": "string",
+          "required": true,
+          "description": "AWS region",
+          "default": "us-east-1"
+        }
+      },
+      "installation": {
+        "command": "uvx",
+        "args": ["awslabs.core-mcp-server@latest"],
+        "env": {
+          "AWS_PROFILE": "{{aws_profile}}",
+          "AWS_REGION": "{{aws_region}}"
+        }
+      },
+      "documentation": "https://github.com/awslabs/mcp/tree/main/src/core-mcp-server",
+      "repository": "https://github.com/awslabs/mcp",
+      "author": "AWS Labs",
+      "tags": ["aws", "core", "ai", "bedrock"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "aws-cost-analysis",
+      "name": "AWS Cost Analysis",
+      "description": "Analyze CDK projects to identify AWS services used and get pricing information from AWS pricing webpages and API",
+      "category": "development",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "aws_profile": {
+          "type": "string",
+          "required": true,
+          "description": "AWS profile name"
+        }
+      },
+      "installation": {
+        "command": "uvx",
+        "args": ["awslabs.cost-analysis-mcp-server@latest"],
+        "env": {
+          "AWS_PROFILE": "{{aws_profile}}"
+        }
+      },
+      "documentation": "https://github.com/awslabs/mcp/tree/main/src/cost-analysis-mcp-server",
+      "repository": "https://github.com/awslabs/mcp",
+      "author": "AWS Labs",
+      "tags": ["aws", "cost", "analysis", "pricing"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "aws-nova-canvas",
+      "name": "AWS Nova Canvas",
+      "description": "Generate images using Amazon Nova Canvas with text prompts and color guidance",
+      "category": "ai",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "aws_profile": {
+          "type": "string",
+          "required": true,
+          "description": "AWS profile name with Bedrock access",
+          "default": "default"
+        },
+        "aws_region": {
+          "type": "string",
+          "required": true,
+          "description": "AWS region",
+          "default": "us-east-1"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@smithery/cli",
+          "install",
+          "@awslabs/nova-canvas-mcp-server",
+          "--client",
+          "claude"
+        ],
+        "env": {
+          "AWS_PROFILE": "{{aws_profile}}",
+          "AWS_REGION": "{{aws_region}}"
+        }
+      },
+      "documentation": "https://github.com/awslabs/mcp/tree/main/src/nova-canvas-mcp-server",
+      "repository": "https://github.com/awslabs/mcp",
+      "author": "AWS Labs",
+      "tags": ["aws", "nova", "image-generation", "ai"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "bankless-onchain",
+      "name": "Bankless Onchain",
+      "description": "Query Onchain data, like ERC20 tokens, transaction history, smart contract state",
+      "category": "web",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": true,
+      "parameters": {
+        "bankless_api_token": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your Bankless API token"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["@bankless/onchain-mcp"],
+        "env": {
+          "BANKLESS_API_TOKEN": "{{bankless_api_token}}"
+        }
+      },
+      "documentation": "https://github.com/bankless/onchain-mcp",
+      "repository": "https://github.com/bankless/onchain-mcp",
+      "author": "Bankless",
+      "tags": ["blockchain", "crypto", "onchain", "web3"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "browserstack-mcp",
+      "name": "BrowserStack",
+      "description": "Bring the full power of BrowserStack's Test Platform to your AI tools, making testing faster and easier",
+      "category": "development",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": true,
+      "parameters": {
+        "browserstack_username": {
+          "type": "string",
+          "required": true,
+          "description": "Your BrowserStack username"
+        },
+        "browserstack_access_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your BrowserStack access key"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@browserstack/mcp-server@latest"],
+        "env": {
+          "BROWSERSTACK_USERNAME": "{{browserstack_username}}",
+          "BROWSERSTACK_ACCESS_KEY": "{{browserstack_access_key}}"
+        }
+      },
+      "documentation": "https://github.com/browserstack/mcp-server",
+      "repository": "https://github.com/browserstack/mcp-server",
+      "author": "BrowserStack",
+      "tags": ["testing", "browser", "automation", "qa"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "bucket-mcp",
+      "name": "Bucket",
+      "description": "Flag features, manage company data, and control feature access using Bucket",
+      "category": "productivity",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": true,
+      "parameters": {
+        "bucket_app_id": {
+          "type": "string",
+          "required": true,
+          "description": "Your Bucket app ID"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["bucket", "mcp", "--app-id", "{{bucket_app_id}}"]
+      },
+      "documentation": "https://github.com/bucketco/bucket-javascript-sdk/tree/main/packages/cli#model-context-protocol",
+      "repository": "https://github.com/bucketco/bucket-javascript-sdk",
+      "author": "Bucket",
+      "tags": ["feature-flags", "management", "configuration"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "buildable-mcp",
+      "name": "Buildable",
+      "description": "Official MCP server for Buildable AI-powered development platform. Enables AI assistants to manage tasks, track progress, get project context, and collaborate with humans on software projects",
+      "category": "development",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "buildable_api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your Buildable API key (starts with 'bp_')"
+        },
+        "buildable_project_id": {
+          "type": "string",
+          "required": true,
+          "description": "Your Buildable project ID"
+        },
+        "buildable_ai_assistant_id": {
+          "type": "string",
+          "required": false,
+          "description": "AI assistant ID (recommended for better context)"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["@bldbl/mcp"],
+        "env": {
+          "BUILDABLE_API_KEY": "{{buildable_api_key}}",
+          "BUILDABLE_PROJECT_ID": "{{buildable_project_id}}",
+          "BUILDABLE_AI_ASSISTANT_ID": "{{buildable_ai_assistant_id}}"
+        }
+      },
+      "documentation": "https://github.com/chunkydotdev/bldbl-mcp",
+      "repository": "https://github.com/chunkydotdev/bldbl-mcp",
+      "author": "Buildable",
+      "tags": ["development", "ai", "project-management", "collaboration"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "campertunity-mcp",
+      "name": "Campertunity",
+      "description": "Search campgrounds around the world on campertunity, check availability, and provide booking links",
+      "category": "utility",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": true,
+      "parameters": {
+        "campertunity_api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your Campertunity API key"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "campertunity-mcp-server@latest"],
+        "env": {
+          "CAMPERTUNITY_API_KEY": "{{campertunity_api_key}}"
+        }
+      },
+      "documentation": "https://github.com/campertunity/mcp-server",
+      "repository": "https://github.com/campertunity/mcp-server",
+      "author": "Campertunity",
+      "tags": ["travel", "camping", "booking", "search"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "chargebee-mcp",
+      "name": "Chargebee",
+      "description": "MCP Server that connects AI agents to Chargebee platform for subscription management and billing",
+      "category": "productivity",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": false,
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@chargebee/mcp@latest"]
+      },
+      "documentation": "https://github.com/chargebee/agentkit/tree/main/modelcontextprotocol",
+      "repository": "https://github.com/chargebee/agentkit",
+      "author": "Chargebee",
+      "tags": ["subscription", "billing", "payments", "saas"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "antv-chart-mcp",
+      "name": "Chart",
+      "description": "A Model Context Protocol server for generating visual charts using AntV visualization library",
+      "category": "utility",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": false,
+      "parameters": {
+        "vis_request_server": {
+          "type": "string",
+          "required": false,
+          "description": "Optional visualization request server URL"
+        },
+        "service_id": {
+          "type": "string",
+          "required": false,
+          "description": "Optional service ID"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@antv/mcp-server-chart"],
+        "env": {
+          "VIS_REQUEST_SERVER": "{{vis_request_server}}",
+          "SERVICE_ID": "{{service_id}}"
+        }
+      },
+      "documentation": "https://github.com/antvis/mcp-server-chart",
+      "repository": "https://github.com/antvis/mcp-server-chart",
+      "author": "AntV",
+      "tags": ["charts", "visualization", "graphics", "data"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "chronulus-mcp",
+      "name": "Chronulus AI",
+      "description": "Predict anything with Chronulus AI forecasting and prediction agents",
+      "category": "ai",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "chronulus_api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your Chronulus AI API key"
+        }
+      },
+      "installation": {
+        "command": "uvx",
+        "args": ["chronulus-mcp"],
+        "env": {
+          "CHRONULUS_API_KEY": "{{chronulus_api_key}}"
+        }
+      },
+      "documentation": "https://github.com/ChronulusAI/chronulus-mcp",
+      "repository": "https://github.com/ChronulusAI/chronulus-mcp",
+      "author": "Chronulus AI",
+      "tags": ["ai", "prediction", "forecasting", "analytics"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "circleci-mcp",
+      "name": "CircleCI",
+      "description": "Enable AI Agents to fix build failures from CircleCI",
+      "category": "development",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "circleci_token": {
+          "type": "api_key",
+          "required": true,
+          "description": "Your CircleCI API token"
+        },
+        "circleci_base_url": {
+          "type": "url",
+          "required": false,
+          "description": "CircleCI base URL (optional)",
+          "default": "https://circleci.com"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@circleci/mcp-server-circleci"],
+        "env": {
+          "CIRCLECI_TOKEN": "{{circleci_token}}",
+          "CIRCLECI_BASE_URL": "{{circleci_base_url}}"
+        }
+      },
+      "documentation": "https://github.com/CircleCI-Public/mcp-server-circleci",
+      "repository": "https://github.com/CircleCI-Public/mcp-server-circleci",
+      "author": "CircleCI",
+      "tags": ["ci-cd", "build", "deployment", "automation"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "coingecko",
+      "name": "CoinGecko",
+      "description": "Official CoinGecko API MCP Server for crypto price & market data across 200+ blockchain networks and 8M+ tokens",
+      "category": "web",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": false,
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@coingecko/coingecko-mcp"]
+      },
+      "documentation": "https://docs.coingecko.com/reference/mcp-server/",
+      "repository": "https://github.com/coingecko/coingecko-mcp",
+      "author": "CoinGecko",
+      "tags": ["crypto", "cryptocurrency", "market-data", "blockchain", "api"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "convex",
+      "name": "Convex",
+      "description": "Introspect and query your apps deployed to Convex backend platform",
+      "category": "development",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": false,
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "convex@latest", "mcp", "start"]
+      },
+      "documentation": "https://stack.convex.dev/convex-mcp-server",
+      "repository": "https://github.com/get-convex/convex-mcp-server",
+      "author": "Convex",
+      "tags": ["backend", "database", "serverless", "convex"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "coresignal",
+      "name": "Coresignal",
+      "description": "Access comprehensive B2B data on companies, employees, and job postings for LLMs and AI workflows",
+      "category": "web",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Coresignal API key for accessing B2B data"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": [
+          "mcp-remote@0.0.22",
+          "https://mcp.coresignal.com/sse",
+          "--header",
+          "apikey:{{api_key}}"
+        ]
+      },
+      "documentation": "https://github.com/Coresignal-com/coresignal-mcp/",
+      "repository": "https://github.com/Coresignal-com/coresignal-mcp/",
+      "author": "Coresignal",
+      "tags": ["b2b-data", "companies", "employees", "jobs", "api"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "wuye-ai",
+      "name": "CRIC Wuye AI",
+      "description": "Intelligent assistant for property management industry with industry-specific knowledge base",
+      "category": "productivity",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "access_token": {
+          "type": "api_key",
+          "required": true,
+          "description": "CRIC Wuye AI access token (contact xuanao@cric.com)"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@wuye-ai/mcp-server-wuye-ai"],
+        "env": {
+          "CRIC_WUYE_AI_ACCESS_TOKEN": "{{access_token}}"
+        }
+      },
+      "documentation": "https://github.com/wuye-ai/mcp-server-wuye-ai",
+      "repository": "https://github.com/wuye-ai/mcp-server-wuye-ai",
+      "author": "Wuye AI",
+      "tags": ["property-management", "real-estate", "ai-assistant", "cric"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "cua",
+      "name": "Computer-Use Agent (CUA)",
+      "description": "MCP server for Computer-Use Agent, allowing you to run CUA through Claude Desktop or other MCP clients",
+      "category": "utility",
+      "type": "stdio",
+      "difficulty": "advanced",
+      "requiresAuth": false,
+      "installation": {
+        "command": "pip",
+        "args": ["install", "cua-mcp-server"]
+      },
+      "documentation": "https://github.com/trycua/cua/tree/main/libs/python/mcp-server",
+      "repository": "https://github.com/trycua/cua",
+      "author": "CUA Team",
+      "tags": ["computer-automation", "agent", "python", "desktop-automation"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "currents",
+      "name": "Currents",
+      "description": "Enable AI agents to fix Playwright test failures reported to Currents testing platform",
+      "category": "development",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Currents API key for accessing test results and CI metadata"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@currents/mcp"],
+        "env": {
+          "CURRENTS_API_KEY": "{{api_key}}"
+        }
+      },
+      "documentation": "https://github.com/currents-dev/currents-mcp",
+      "repository": "https://github.com/currents-dev/currents-mcp",
+      "author": "Currents",
+      "tags": ["testing", "playwright", "ci-cd", "debugging", "test-failures"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "dart",
+      "name": "Dart",
+      "description": "AI-native project management tool for task, doc, and project data interaction",
+      "category": "productivity",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": true,
+      "parameters": {
+        "dart_token": {
+          "type": "api_key",
+          "required": true,
+          "description": "Dart access token from https://app.itsdart.com/?settings=account"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "dart-mcp-server"],
+        "env": {
+          "DART_TOKEN": "{{dart_token}}"
+        }
+      },
+      "documentation": "https://github.com/its-dart/dart-mcp-server",
+      "repository": "https://github.com/its-dart/dart-mcp-server",
+      "author": "Dart",
+      "tags": ["project-management", "tasks", "ai-native", "productivity"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "dealx",
+      "name": "DealX",
+      "description": "Search and manage ads on DealX platform for marketplace operations",
+      "category": "web",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": false,
+      "parameters": {
+        "api_url": {
+          "type": "url",
+          "required": false,
+          "description": "DealX API URL (optional, defaults to production)",
+          "default": "https://api.dealx.com"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@dealx/mcp-server"],
+        "env": {
+          "DEALX_API_URL": "{{api_url}}"
+        }
+      },
+      "documentation": "https://github.com/DealExpress/mcp-server",
+      "repository": "https://github.com/DealExpress/mcp-server",
+      "author": "DealExpress",
+      "tags": ["marketplace", "ads", "e-commerce", "dealx"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "debugg-ai",
+      "name": "Debugg AI",
+      "description": "AI-driven browser automation and end-to-end testing platform integration",
+      "category": "development",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": true,
+      "parameters": {
+        "api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Debugg AI API key from free account signup"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@debugg-ai/debugg-ai-mcp"],
+        "env": {
+          "DEBUGGAI_API_KEY": "{{api_key}}"
+        }
+      },
+      "documentation": "https://github.com/debugg-ai/debugg-ai-mcp",
+      "repository": "https://github.com/debugg-ai/debugg-ai-mcp",
+      "author": "Debugg AI",
+      "tags": ["testing", "automation", "e2e", "browser", "ai-testing"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "octagon-deep-research",
+      "name": "Octagon Deep Research",
+      "description": "Lightning-fast, high-accuracy deep research agent for comprehensive analysis",
+      "category": "ai",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": true,
+      "parameters": {
+        "api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Octagon API key from https://app.octagonai.co/signup/"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "octagon-deep-research-mcp"],
+        "env": {
+          "OCTAGON_API_KEY": "{{api_key}}"
+        }
+      },
+      "documentation": "https://github.com/OctagonAI/octagon-deep-research-mcp",
+      "repository": "https://github.com/OctagonAI/octagon-deep-research-mcp",
+      "author": "OctagonAI",
+      "tags": ["research", "analysis", "ai-agent", "deep-research"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "alibaba-dataworks",
+      "name": "Alibaba DataWorks",
+      "description": "Interact with DataWorks Open API for cloud resource operations and data management",
+      "category": "database",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "access_key_id": {
+          "type": "api_key",
+          "required": true,
+          "description": "Alibaba Cloud Access Key ID"
+        },
+        "access_key_secret": {
+          "type": "api_key",
+          "required": true,
+          "description": "Alibaba Cloud Access Key Secret"
+        },
+        "region": {
+          "type": "select",
+          "required": true,
+          "description": "Alibaba Cloud region",
+          "options": ["cn-hangzhou", "cn-shanghai", "cn-beijing", "cn-shenzhen", "ap-southeast-1"],
+          "default": "cn-hangzhou"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "alibabacloud-dataworks-mcp-server"],
+        "env": {
+          "ALIBABA_CLOUD_ACCESS_KEY_ID": "{{access_key_id}}",
+          "ALIBABA_CLOUD_ACCESS_KEY_SECRET": "{{access_key_secret}}",
+          "ALIBABA_CLOUD_REGION": "{{region}}"
+        }
+      },
+      "documentation": "https://github.com/aliyun/alibabacloud-dataworks-mcp-server",
+      "repository": "https://github.com/aliyun/alibabacloud-dataworks-mcp-server",
+      "author": "Alibaba Cloud",
+      "tags": ["cloud", "dataworks", "alibaba", "data-management", "etl"],
+      "validatedOn": "2025-01-02"
     }
   ]
 }
