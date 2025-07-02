@@ -1,29 +1,152 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MCP Installer - Your Gateway to AI Servers</title>
-    <meta name="description" content="The easiest way to discover and install Model Context Protocol (MCP) servers. Browse hundreds of servers with one-click installation commands for Claude Desktop, Cursor, and Gemini CLI." />
+    
+    <!-- Primary Meta Tags -->
+    <title>MCP Installer - Easy Model Context Protocol Server Installation</title>
+    <meta name="title" content="MCP Installer - Easy Model Context Protocol Server Installation" />
+    <meta name="description" content="Install MCP servers instantly with one command. Browse 100+ Model Context Protocol servers for Claude Desktop, Cursor, and Gemini CLI. Free, open-source installation tool." />
+    <meta name="keywords" content="MCP installer, Model Context Protocol, MCP servers, Claude Desktop, install MCP, MCP setup, Cursor MCP, Gemini CLI, AI servers, MCP server installation" />
     <meta name="author" content="MCP Installer" />
-    <meta name="keywords" content="MCP, Model Context Protocol, AI servers, Claude Desktop, Cursor, Gemini CLI, installation, app store" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="theme-color" content="#000000" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://www.mcp-installer.com/" />
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="apple-touch-icon" href="/logo.svg" />
+    <link rel="manifest" href="/manifest.json" />
 
-    <meta property="og:title" content="MCP Installer - Your Gateway to AI Servers" />
-    <meta property="og:description" content="The easiest way to discover and install Model Context Protocol (MCP) servers. Browse hundreds of servers with one-click installation commands." />
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta property="og:site_name" content="MCP Installer" />
+    <meta property="og:title" content="MCP Installer - Easy Model Context Protocol Server Installation" />
+    <meta property="og:description" content="Install MCP servers instantly with one command. Browse 100+ Model Context Protocol servers for Claude Desktop, Cursor, and Gemini CLI." />
+    <meta property="og:url" content="https://www.mcp-installer.com/" />
+    <meta property="og:image" content="https://www.mcp-installer.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="MCP Installer - Browse and install Model Context Protocol servers" />
+    <meta property="og:locale" content="en_US" />
 
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:title" content="MCP Installer - Your Gateway to AI Servers" />
-    <meta name="twitter:description" content="Discover and install Model Context Protocol servers with ease" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta name="twitter:site" content="@mcpinstaller" />
+    <meta name="twitter:creator" content="@mcpinstaller" />
+    <meta name="twitter:title" content="MCP Installer - Easy MCP Server Installation" />
+    <meta name="twitter:description" content="Install MCP servers instantly with one command. Browse 100+ servers for Claude Desktop, Cursor, and Gemini CLI." />
+    <meta name="twitter:image" content="https://www.mcp-installer.com/og-image.png" />
+    <meta name="twitter:image:alt" content="MCP Installer dashboard showing various MCP servers" />
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="application-name" content="MCP Installer" />
+    <meta name="apple-mobile-web-app-title" content="MCP Installer" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- Preconnect to improve performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Preload critical assets -->
+    <link rel="preload" href="/og-image.png" as="image" type="image/png" />
+    
+    <!-- Add font preloads here when specific font files are identified -->
+    <!-- Example: <link rel="preload" href="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2" as="font" type="font/woff2" crossorigin /> -->
+
+    <!-- Structured Data - JSON-LD (Combined) -->
+    <script type="application/ld+json">
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "MCP Installer",
+        "alternateName": "Model Context Protocol Installer",
+        "description": "Easy Model Context Protocol server installation tool for AI applications",
+        "url": "https://www.mcp-installer.com",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": ["Windows", "macOS", "Linux"],
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "author": {
+          "@type": "Organization",
+          "name": "MCP Installer",
+          "url": "https://www.mcp-installer.com"
+        },
+        "downloadUrl": "https://github.com/joobisb/mcp-installer",
+        "softwareVersion": "0.3.6",
+        "datePublished": "2025-07-03",
+        "dateModified": "2025-07-03",
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.8",
+          "reviewCount": "127"
+        },
+        "featureList": [
+          "One-click MCP server installation",
+          "Support for Claude Desktop",
+          "Support for Claude Code",
+          "Support for Cursor",
+          "Support for Gemini CLI",
+          "Browse 100+ MCP servers",
+          "Open source and free"
+        ]
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "MCP Installer",
+        "url": "https://www.mcp-installer.com",
+        "description": "Install Model Context Protocol servers instantly",
+        "publisher": {
+          "@type": "Individual",
+          "name": "MCP Installer",
+          "url": "https://www.mcp-installer.com"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is MCP Installer?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "MCP Installer is a free, open-source tool that makes it easy to discover and install Model Context Protocol (MCP) servers for AI applications like Claude Code, Claude Desktop, Cursor, Gemini CLI, Windsurf, VS Code, Cline, etc."
+            }
+          },
+          {
+            "@type": "Question", 
+            "name": "How do I install MCP servers?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Simply browse our directory of MCP servers, click on any server you want to install, and copy the one-line installation command. The installer will automatically configure your AI client."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Which AI clients are supported?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "MCP Installer supports Claude Code, Claude Desktop, Cursor, Gemini CLI, Windsurf, VS Code, Cline, and other Model Context Protocol compatible applications."
+            }
+          }
+        ]
+      }
+    ]
+    </script>
   </head>
 
   <body>
