@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2025-01-02T16:00:00Z",
+  "lastUpdated": "2025-01-02T17:00:00Z",
   "servers": [
     {
       "id": "postgres",
@@ -2148,6 +2148,344 @@
       "repository": "https://github.com/aliyun/alibabacloud-dataworks-mcp-server",
       "author": "Alibaba Cloud",
       "tags": ["cloud", "dataworks", "alibaba", "data-management", "etl"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "exa",
+      "name": "Exa",
+      "description": "AI-powered search engine for web search, research papers, and company research",
+      "category": "web",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": true,
+      "parameters": {
+        "api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Exa API key from dashboard.exa.ai"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "exa-mcp-server"],
+        "env": {
+          "EXA_API_KEY": "{{api_key}}"
+        }
+      },
+      "documentation": "https://github.com/exa-labs/exa-mcp-server",
+      "repository": "https://github.com/exa-labs/exa-mcp-server",
+      "author": "Exa Labs",
+      "tags": ["search", "ai-search", "research", "web"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "firecrawl",
+      "name": "Firecrawl",
+      "description": "Web scraping and crawling capabilities for data extraction from websites",
+      "category": "web",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": true,
+      "parameters": {
+        "api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Firecrawl API key from firecrawl.dev"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "firecrawl-mcp"],
+        "env": {
+          "FIRECRAWL_API_KEY": "{{api_key}}"
+        }
+      },
+      "documentation": "https://github.com/mendableai/firecrawl-mcp-server",
+      "repository": "https://github.com/mendableai/firecrawl-mcp-server",
+      "author": "Mendable AI",
+      "tags": ["web-scraping", "crawling", "data-extraction", "automation"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "fetchserp",
+      "name": "FetchSERP",
+      "description": "All-in-One SEO & Web Intelligence Toolkit for search engine results and analysis",
+      "category": "web",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": true,
+      "parameters": {
+        "api_token": {
+          "type": "api_key",
+          "required": true,
+          "description": "FetchSERP API token (250 free credits available)"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["github:fetchSERP/fetchserp-mcp-server-node"],
+        "env": {
+          "FETCHSERP_API_TOKEN": "{{api_token}}"
+        }
+      },
+      "documentation": "https://github.com/fetchSERP/fetchserp-mcp-server-node",
+      "repository": "https://github.com/fetchSERP/fetchserp-mcp-server-node",
+      "author": "FetchSERP",
+      "tags": ["seo", "serp", "search-intelligence", "web-analysis"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "fewsats",
+      "name": "Fewsats",
+      "description": "Enable AI agents to purchase anything securely using Fewsats payment platform",
+      "category": "utility",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "Fewsats API key for secure payments"
+        }
+      },
+      "installation": {
+        "command": "uvx",
+        "args": ["fewsats-mcp"],
+        "env": {
+          "FEWSATS_API_KEY": "{{api_key}}"
+        }
+      },
+      "documentation": "https://github.com/Fewsats/fewsats-mcp",
+      "repository": "https://github.com/Fewsats/fewsats-mcp",
+      "author": "Fewsats",
+      "tags": ["payments", "commerce", "security", "bitcoin"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "esignatures",
+      "name": "eSignatures",
+      "description": "Contract and template management for drafting, reviewing, and sending binding contracts",
+      "category": "productivity",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "secret_token": {
+          "type": "api_key",
+          "required": true,
+          "description": "eSignatures API secret token"
+        }
+      },
+      "installation": {
+        "command": "uvx",
+        "args": ["mcp-server-esignatures"],
+        "env": {
+          "ESIGNATURES_SECRET_TOKEN": "{{secret_token}}"
+        }
+      },
+      "documentation": "https://github.com/esignaturescom/mcp-server-esignatures",
+      "repository": "https://github.com/esignaturescom/mcp-server-esignatures",
+      "author": "eSignatures.com",
+      "tags": ["contracts", "signatures", "legal", "documents"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "fulcra-context",
+      "name": "Fulcra Context",
+      "description": "Access personal health, workouts, sleep, location data through Fulcra platform",
+      "category": "productivity",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": false,
+      "installation": {
+        "command": "uvx",
+        "args": ["fulcra-context-mcp@latest"]
+      },
+      "documentation": "https://github.com/fulcradynamics/fulcra-context-mcp",
+      "repository": "https://github.com/fulcradynamics/fulcra-context-mcp",
+      "author": "Fulcra Dynamics",
+      "tags": ["health", "fitness", "wellness", "personal-data"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "gitee",
+      "name": "Gitee",
+      "description": "Interact with Gitee repositories, issues, and pull requests",
+      "category": "development",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "access_token": {
+          "type": "api_key",
+          "required": true,
+          "description": "Gitee personal access token"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@gitee/mcp-gitee@latest"],
+        "env": {
+          "GITEE_ACCESS_TOKEN": "{{access_token}}"
+        }
+      },
+      "documentation": "https://github.com/oschina/mcp-gitee",
+      "repository": "https://github.com/oschina/mcp-gitee",
+      "author": "OSChina",
+      "tags": ["git", "repository", "chinese", "development"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "globalping",
+      "name": "Globalping",
+      "description": "Global network testing with ping, traceroute, DNS, and HTTP commands",
+      "category": "web",
+      "type": "stdio",
+      "difficulty": "simple",
+      "requiresAuth": false,
+      "installation": {
+        "command": "npx",
+        "args": ["mcp-remote", "https://mcp.globalping.dev/sse"]
+      },
+      "documentation": "https://github.com/jsdelivr/globalping-mcp-server",
+      "repository": "https://github.com/jsdelivr/globalping-mcp-server",
+      "author": "jsDelivr",
+      "tags": ["network", "ping", "traceroute", "dns", "testing"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "google-cloud-run",
+      "name": "Google Cloud Run",
+      "description": "Deploy applications to Google Cloud Run with AI assistance",
+      "category": "development",
+      "type": "stdio",
+      "difficulty": "advanced",
+      "requiresAuth": true,
+      "parameters": {
+        "project_id": {
+          "type": "string",
+          "required": true,
+          "description": "Google Cloud Project ID"
+        },
+        "region": {
+          "type": "select",
+          "required": true,
+          "description": "Google Cloud region",
+          "options": ["us-central1", "us-east1", "us-west1", "europe-west1", "asia-east1"],
+          "default": "us-central1"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "cloud-run-mcp"],
+        "env": {
+          "GOOGLE_CLOUD_PROJECT": "{{project_id}}",
+          "GOOGLE_CLOUD_REGION": "{{region}}"
+        }
+      },
+      "documentation": "https://github.com/GoogleCloudPlatform/cloud-run-mcp",
+      "repository": "https://github.com/GoogleCloudPlatform/cloud-run-mcp",
+      "author": "Google Cloud Platform",
+      "tags": ["google-cloud", "deployment", "serverless", "containers"],
+      "validatedOn": "2025-01-02",
+      "notes": "Requires Google Cloud SDK authentication"
+    },
+    {
+      "id": "gotohuman",
+      "name": "gotoHuman",
+      "description": "Human-in-the-loop workflow for AI agent approvals and oversight",
+      "category": "productivity",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": true,
+      "parameters": {
+        "api_key": {
+          "type": "api_key",
+          "required": true,
+          "description": "gotoHuman API key from app.gotohuman.com"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "@gotohuman/mcp-server"],
+        "env": {
+          "GOTOHUMAN_API_KEY": "{{api_key}}"
+        }
+      },
+      "documentation": "https://github.com/gotohuman/gotohuman-mcp-server",
+      "repository": "https://github.com/gotohuman/gotohuman-mcp-server",
+      "author": "gotoHuman",
+      "tags": ["human-in-loop", "approval", "workflow", "oversight"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "graphlit",
+      "name": "Graphlit",
+      "description": "RAG platform for document ingestion and knowledge base management",
+      "category": "ai",
+      "type": "stdio",
+      "difficulty": "advanced",
+      "requiresAuth": true,
+      "parameters": {
+        "organization_id": {
+          "type": "string",
+          "required": true,
+          "description": "Graphlit Organization ID"
+        },
+        "environment_id": {
+          "type": "string",
+          "required": true,
+          "description": "Graphlit Environment ID"
+        },
+        "jwt_secret": {
+          "type": "api_key",
+          "required": true,
+          "description": "Graphlit JWT Secret"
+        }
+      },
+      "installation": {
+        "command": "npx",
+        "args": ["-y", "graphlit-mcp-server"],
+        "env": {
+          "GRAPHLIT_ORGANIZATION_ID": "{{organization_id}}",
+          "GRAPHLIT_ENVIRONMENT_ID": "{{environment_id}}",
+          "GRAPHLIT_JWT_SECRET": "{{jwt_secret}}"
+        }
+      },
+      "documentation": "https://github.com/graphlit/graphlit-mcp-server",
+      "repository": "https://github.com/graphlit/graphlit-mcp-server",
+      "author": "Graphlit",
+      "tags": ["rag", "knowledge-base", "documents", "ai", "search"],
+      "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "greptimedb",
+      "name": "GreptimeDB",
+      "description": "Time-series database exploration and analysis interface",
+      "category": "database",
+      "type": "stdio",
+      "difficulty": "medium",
+      "requiresAuth": false,
+      "parameters": {
+        "database_url": {
+          "type": "string",
+          "required": false,
+          "description": "GreptimeDB connection URL (optional)",
+          "placeholder": "greptimedb://localhost:4001/public"
+        }
+      },
+      "installation": {
+        "command": "pip",
+        "args": ["install", "greptimedb-mcp-server"],
+        "env": {
+          "GREPTIMEDB_URL": "{{database_url}}"
+        }
+      },
+      "documentation": "https://github.com/GreptimeTeam/greptimedb-mcp-server",
+      "repository": "https://github.com/GreptimeTeam/greptimedb-mcp-server",
+      "author": "GreptimeTeam",
+      "tags": ["database", "time-series", "analytics", "monitoring"],
       "validatedOn": "2025-01-02"
     }
   ]

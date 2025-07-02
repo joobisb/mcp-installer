@@ -2,9 +2,9 @@
 
 **One-click MCP server installation across AI clients**
 
-MCP Installer is a command-line tool that simplifies the installation and management of MCP (Model Context Protocol) servers across different AI clients like Claude Desktop, Cursor, and Gemini.
+MCP Installer is a command-line tool that simplifies the installation and management of MCP (Model Context Protocol) servers across different AI clients like Claude Code, Claude Desktop, Cursor, Gemini and more to come(Windsurf, VS Code, Cline, etc.).
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 
@@ -25,7 +25,7 @@ mcp-installer install filesystem --clients=cursor,gemini
 mcp-installer list --available
 ```
 
-## 🎯 Supported Clients
+## Supported Clients
 
 | Client             | Status       |
 | ------------------ | ------------ |
@@ -175,12 +175,6 @@ mcp-installer restore <backup-path> [options]
 - **Node.js** >= 18.0.0
 - At least one supported AI client installed
 
-## 🔒 Security & Safety
-
-- **Automatic Backups**: Configurations are backed up before any changes
-- **Atomic Operations**: Changes are applied atomically to prevent corruption
-- **Validation**: All configurations are validated before writing
-
 ## 🐛 Troubleshooting
 
 ### Common Issues
@@ -189,12 +183,6 @@ mcp-installer restore <backup-path> [options]
 
 - Ensure you have Claude Desktop, Cursor, or Gemini installed
 - Run `mcp-installer doctor` for detailed diagnostics
-
-**"Server installation failed"**
-
-- Check your internet connection for npm package downloads
-- Verify you have the required permissions to write config files
-- Some servers require environment variables (check server documentation)
 
 ### Getting Help
 
@@ -223,14 +211,6 @@ pnpm run build
 
 For detailed development workflows, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
-## 🤝 Contributing
-
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
 ---
 
-**Made with ❤️ to simplify MCP adoption for everyone**
+**Made with curiosity and ❤️ to simplify MCP adoption for everyone**
