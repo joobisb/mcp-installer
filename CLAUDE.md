@@ -219,7 +219,7 @@ npm run typecheck
 
 ### Testing Strategy
 
-- **Unit Tests**: Jest with memfs for safe filesystem testing
+- **Unit Tests**: Jest with memfs for safe filesystem testing. Always ensure comprehenisve unit tests are added for all code change and should not break existing functionality.
 - **Integration Tests**: Test CLI commands with mock configs
 - **E2E Tests**: Playwright for web app testing
 - **Manual Testing**: Test with real client configurations
@@ -294,6 +294,31 @@ mcp-installer/
 - **Dependency Management**: Handle MCP server dependencies and conflicts
 - **Performance Monitoring**: Track installation success rates and performance
 - **Community Features**: Ratings, reviews, and usage statistics for MCP servers
+
+## Recent Implementation Summary
+
+### Command Validation System ✅
+
+- **CommandValidator**: Validates system dependencies (`npx`, `uvx`, `docker`, etc.) before installation
+- **OS-Specific Instructions**: Provides Mac/Linux/Windows installation commands for missing dependencies
+- **Seamless Integration**: Automatically checks and warns users about missing requirements during install
+
+### Enhanced UX & Reliability ✅
+
+- **Fixed Uninstall Issues**: Eliminated spinner conflicts during user prompts, corrected typos, proper server name display
+- **Better Error Handling**: Clear warnings and actionable steps for users when dependencies are missing
+
+### servers.json Registry Importance
+
+The `servers.json` file is the **core intelligence** of the MCP Installer:
+
+- **Central Source of Truth**: Contains 40+ MCP servers with installation commands, dependencies, and metadata
+- **Command Detection**: Powers the CommandValidator to determine which system commands each server requires
+- **Installation Logic**: Defines exact commands (`npx`, `uvx`, `docker`) and arguments needed for each server
+- **User Experience**: Enables automatic parameter prompting, validation, and OS-specific dependency guidance
+- **Extensibility**: Simple JSON structure allows easy addition of new servers and installation methods
+
+The registry bridges the gap between complex MCP server installations and the "one-click" user experience by encoding all necessary installation intelligence into a structured, maintainable format.
 
 ---
 

@@ -1,7 +1,13 @@
 import chalk from 'chalk';
 import ora from 'ora';
 import inquirer from 'inquirer';
-import { ClientManager, ConfigEngine, ParameterHandler, ServerRegistry } from '../core/index.js';
+import {
+  ClientManager,
+  ConfigEngine,
+  ParameterHandler,
+  ServerRegistry,
+  CommandValidator,
+} from '../core/index.js';
 import { ClientType, getClientDisplayName, InstallationResult } from '@mcp-installer/shared';
 
 interface InstallOptions {
@@ -226,8 +232,38 @@ export async function installCommand(serverName: string, options: InstallOptions
       console.log(chalk.red(`  ✗ Failed: ${failed}`));
     }
 
+    // Validate required commands are available
     if (successful > 0) {
-      console.log(chalk.yellow('Next steps:'));
+      console.log(chalk.cyan('\nValidating system requirements...'));
+      const commandValidator = new CommandValidator();
+      const validation = commandValidator.validateServerCommands(server);
+
+      if (!validation.isValid) {
+        console.log(chalk.yellow('\n⚠️  Required commands missing on your system:'));
+        console.log(
+          chalk.red('   The server was configured but may not work without these dependencies.\n')
+        );
+
+        const instructions = commandValidator.getInstallationInstructions(
+          validation.missingCommands
+        );
+        instructions.forEach((instruction) => {
+          console.log(chalk.yellow(instruction));
+        });
+
+        console.log(
+          chalk.cyan(`\n🔍 System Info: ${commandValidator.getCurrentOS()} (${process.platform})`)
+        );
+        console.log(
+          chalk.gray('   After installing missing commands, the MCP server should work properly.')
+        );
+      } else {
+        console.log(chalk.green('✓ All required commands are available on your system'));
+      }
+    }
+
+    if (successful > 0) {
+      console.log(chalk.yellow('\nNext steps:'));
       console.log(chalk.white('  1. Restart your AI client(s)'));
       console.log(chalk.white(`  2. The ${server.name} server should now be available`));
       if (server.documentation) {

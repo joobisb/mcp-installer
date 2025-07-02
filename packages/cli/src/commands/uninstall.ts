@@ -61,7 +61,7 @@ export async function uninstallCommand(
       }
     }
 
-    spinner.text = 'Checking server installationss...';
+    spinner.text = 'Checking server installations...';
     const installedClients: Array<{ client: ClientType; configPath: string }> = [];
 
     for (const clientType of targetClients) {
@@ -92,9 +92,14 @@ export async function uninstallCommand(
       return;
     }
 
+    spinner.succeed(chalk.green('Installation check completed'));
+
     console.log(
-      chalk.cyan(`Uninstalling ${serverName} from ${installedClients.length} client(s)...`)
+      chalk.cyan(`About to uninstall '${serverName}' from ${installedClients.length} client(s):`)
     );
+    installedClients.forEach(({ client }) => {
+      console.log(chalk.white(`  • ${getClientDisplayName(client)}`));
+    });
 
     const { proceed } = await inquirer.prompt([
       {

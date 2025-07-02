@@ -407,7 +407,7 @@ export class ServerRegistry {
 
     if (server.requiresAuth && !server.installation.env) {
       result.warnings.push(
-        `Server '${serverId}' requires authentication but no environment variables specified`
+        `Server '${serverId}' requires authentication but no environment variables specified. AI Clients might prompt to login after successful installation.`
       );
     }
 
