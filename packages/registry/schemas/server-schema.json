@@ -32,7 +32,17 @@
           },
           "category": {
             "type": "string",
-            "enum": ["development", "productivity", "database", "web", "ai", "utility"]
+            "enum": [
+              "development",
+              "productivity",
+              "database",
+              "web",
+              "ai",
+              "utility",
+              "monitoring",
+              "crm",
+              "cloud-service"
+            ]
           },
           "type": {
             "type": "string",
@@ -40,7 +50,7 @@
           },
           "difficulty": {
             "type": "string",
-            "enum": ["simple", "medium", "advanced"]
+            "enum": ["simple", "medium", "advanced", "complex"]
           },
           "requiresAuth": {
             "type": "boolean"
@@ -61,7 +71,8 @@
                     "string",
                     "number",
                     "boolean",
-                    "url"
+                    "url",
+                    "select"
                   ]
                 },
                 "required": {
@@ -94,6 +105,13 @@
                 "default": {
                   "type": "string",
                   "description": "Default value if parameter is optional and user doesn't provide one"
+                },
+                "options": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Available options for select type parameters"
                 }
               },
               "required": ["type", "description"]
@@ -148,6 +166,10 @@
             "type": "string",
             "format": "date",
             "description": "Date when server was last manually validated"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Optional notes about the server"
           }
         },
         "required": [

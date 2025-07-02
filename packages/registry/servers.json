@@ -750,7 +750,6 @@
       "installation": {
         "command": "pip",
         "args": ["install", "doris-mcp-server"],
-        "startupCommand": "doris-mcp-server --transport stdio",
         "env": {
           "DORIS_HOST": "{{doris_host}}",
           "DORIS_PORT": "{{doris_port}}",
