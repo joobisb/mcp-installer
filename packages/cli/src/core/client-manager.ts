@@ -10,6 +10,8 @@ export class ClientManager {
       name: string;
       configPaths: string[];
       detectCommand?: string;
+      autoCreateConfig?: boolean;
+      configTemplate?: object;
     }
   > = {
     'claude-desktop': {
@@ -24,6 +26,10 @@ export class ClientManager {
       name: 'Cursor',
       configPaths: [join(homedir(), '.cursor', 'mcp.json')],
       detectCommand: 'cursor',
+      autoCreateConfig: true,
+      configTemplate: {
+        mcpServers: {},
+      },
     },
     gemini: {
       name: 'Gemini',
@@ -67,23 +73,41 @@ export class ClientManager {
     let isInstalled = false;
     let configExists = false;
 
-    // Check if config file exists
+    // Always set configPath to the primary path (for potential creation)
     if (config.configPaths.length > 0) {
+      configPath = config.configPaths[0];
+
+      // Check if config file exists, and auto-create if needed
       for (const path of config.configPaths) {
         if (existsSync(path)) {
           configPath = path;
           configExists = true;
           break;
-        }
-      }
+        } else {
+          // Check if parent directory exists and we can auto-create config
+          const { dirname } = await import('path');
+          const parentDir = dirname(path);
 
-      // Always set configPath to the primary path
-      if (!configPath && config.configPaths.length > 0) {
-        configPath = config.configPaths[0];
+          if (existsSync(parentDir) && config.autoCreateConfig && config.configTemplate) {
+            try {
+              const { writeFileSync } = await import('fs');
+
+              // Create the config file with the template
+              writeFileSync(path, JSON.stringify(config.configTemplate, null, 2));
+
+              configPath = path;
+              configExists = true;
+              break;
+            } catch (error) {
+              // Failed to create config file, continue to next path
+              console.warn(`Failed to auto-create config at ${path}:`, error);
+            }
+          }
+        }
       }
     }
 
-    // Check if app is installed via command
+    // Primary detection: Check if app is installed via command
     if (config.detectCommand) {
       try {
         const { execSync } = await import('child_process');
@@ -94,7 +118,8 @@ export class ClientManager {
       }
     }
 
-    // Fallback: if config exists, assume app is installed
+    // Secondary detection: if config exists, assume app is installed
+    // (for clients without detectCommand or as fallback)
     if (!isInstalled && configExists) {
       isInstalled = true;
     }
@@ -104,6 +129,7 @@ export class ClientManager {
       name: config.name,
       configPath,
       isInstalled,
+      configExists,
     };
   }
 

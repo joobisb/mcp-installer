@@ -295,6 +295,12 @@ mcp-installer/
 - **Performance Monitoring**: Track installation success rates and performance
 - **Community Features**: Ratings, reviews, and usage statistics for MCP servers
 
+## Pacakage management
+
+- All the packages are managed using pnpm.
+- pnpm workspaces are used to manage the dependencies between the packages.
+- Tests are run using pnpm test.
+
 ## Recent Implementation Summary
 
 ### Command Validation System ✅

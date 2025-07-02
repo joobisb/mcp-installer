@@ -135,8 +135,15 @@ describe('installCommand', () => {
       isInstalled: true,
       configPath: '/test/claude.json',
       name: 'Claude Desktop',
+      configExists: true,
     },
-    { type: 'cursor', isInstalled: true, configPath: '/test/cursor.json', name: 'Cursor' },
+    {
+      type: 'cursor',
+      isInstalled: true,
+      configPath: '/test/cursor.json',
+      name: 'Cursor',
+      configExists: true,
+    },
   ];
 
   describe('successful installation scenarios', () => {

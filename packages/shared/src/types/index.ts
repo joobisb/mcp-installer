@@ -78,6 +78,7 @@ export interface ClientInfo {
   name: string;
   configPath: string;
   isInstalled: boolean;
+  configExists?: boolean;
   version?: string;
 }
 

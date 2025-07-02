@@ -90,14 +90,28 @@ describe('uninstallCommand', () => {
           isInstalled: true,
           configPath: '/test/claude.json',
           name: 'Claude Desktop',
+          configExists: true,
         },
-        { type: 'cursor', isInstalled: true, configPath: '/test/cursor.json', name: 'Cursor' },
-        { type: 'gemini', isInstalled: true, configPath: '/test/gemini.json', name: 'Gemini' },
+        {
+          type: 'cursor',
+          isInstalled: true,
+          configPath: '/test/cursor.json',
+          name: 'Cursor',
+          configExists: true,
+        },
+        {
+          type: 'gemini',
+          isInstalled: true,
+          configPath: '/test/gemini.json',
+          name: 'Gemini',
+          configExists: true,
+        },
         {
           type: 'claude-code',
           isInstalled: true,
           configPath: '/test/claude-code.json',
           name: 'Claude Code',
+          configExists: true,
         },
       ]);
 

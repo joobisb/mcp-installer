@@ -134,4 +134,69 @@ describe('ClientManager', () => {
       }).toThrow();
     });
   });
+
+  describe('auto-config creation', () => {
+    it('should auto-create cursor config when directory exists but file does not', async () => {
+      // Setup: .cursor directory exists but mcp.json doesn't
+      vol.fromJSON({
+        '/Users/test/.cursor/': null, // Directory exists but empty
+      });
+
+      // Mock execSync to simulate cursor command not found
+      const mockExecSync = jest.spyOn(require('child_process'), 'execSync');
+      mockExecSync.mockImplementation(() => {
+        throw new Error('Command not found');
+      });
+
+      const client = await clientManager.detectClient('cursor');
+
+      expect(client.type).toBe('cursor');
+      expect(client.isInstalled).toBe(true); // Config exists, so considered installed
+      expect(client.configExists).toBe(true); // Config was auto-created
+      expect(client.configPath).toContain('.cursor/mcp.json');
+
+      // Verify the config file was created with the correct template
+      const configContent = vol.readFileSync('/Users/test/.cursor/mcp.json', 'utf-8') as string;
+      const config = JSON.parse(configContent);
+      expect(config).toEqual({
+        mcpServers: {},
+      });
+
+      mockExecSync.mockRestore();
+    });
+
+    it('should not auto-create config for clients without autoCreateConfig', async () => {
+      // Setup: .claude directory exists but config doesn't
+      vol.fromJSON({
+        '/Users/test/.claude/': null, // Directory exists but empty
+      });
+
+      const client = await clientManager.detectClient('claude-desktop');
+
+      expect(client.type).toBe('claude-desktop');
+      expect(client.isInstalled).toBe(false);
+      expect(client.configExists).toBe(false); // No auto-creation for claude-desktop
+    });
+
+    it('should not auto-create config when parent directory does not exist', async () => {
+      // Setup: No .cursor directory exists
+      vol.fromJSON({
+        '/Users/test/': null, // Only home directory exists
+      });
+
+      // Mock execSync to simulate cursor command not found
+      const mockExecSync = jest.spyOn(require('child_process'), 'execSync');
+      mockExecSync.mockImplementation(() => {
+        throw new Error('Command not found');
+      });
+
+      const client = await clientManager.detectClient('cursor');
+
+      expect(client.type).toBe('cursor');
+      expect(client.isInstalled).toBe(false);
+      expect(client.configExists).toBe(false); // No auto-creation when dir doesn't exist
+
+      mockExecSync.mockRestore();
+    });
+  });
 });
