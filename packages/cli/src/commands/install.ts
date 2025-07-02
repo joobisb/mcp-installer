@@ -131,7 +131,7 @@ export async function installCommand(serverName: string, options: InstallOptions
     if (options.dryRun) {
       const { args, env } = parameterHandler.substituteParameters(server, parameterValues);
       spinner.succeed(chalk.green('Dry run completed successfully'));
-      console.log(chalk.cyan('\\nWould install:'));
+      console.log(chalk.cyan('Would install:'));
       console.log(chalk.white(`  Server: ${server.name} (${server.id})`));
       console.log(chalk.white(`  Clients: ${targetClients.map(getClientDisplayName).join(', ')}`));
       console.log(chalk.white(`  Command: ${server.installation.command} ${args.join(' ')}`));
@@ -147,12 +147,12 @@ export async function installCommand(serverName: string, options: InstallOptions
       return;
     }
 
-    console.log(chalk.cyan(`\\nInstalling ${server.name} to ${targetClients.length} client(s)...`));
+    console.log(chalk.cyan(`Installing ${server.name} to ${targetClients.length} client(s)...`));
 
     if (server.requiresAuth && server.installation.env) {
       console.log(
         chalk.yellow(
-          '\\nThis server requires authentication. Please ensure environment variables are set:'
+          'This server requires authentication. Please ensure environment variables are set:'
         )
       );
       Object.keys(server.installation.env).forEach((envVar) => {
@@ -220,14 +220,14 @@ export async function installCommand(serverName: string, options: InstallOptions
     const successful = results.filter((r) => r.success).length;
     const failed = results.filter((r) => !r.success).length;
 
-    console.log(chalk.cyan('\\nInstallation Summary:'));
+    console.log(chalk.cyan('Installation Summary:'));
     console.log(chalk.green(`  ✓ Successful: ${successful}`));
     if (failed > 0) {
       console.log(chalk.red(`  ✗ Failed: ${failed}`));
     }
 
     if (successful > 0) {
-      console.log(chalk.yellow('\\nNext steps:'));
+      console.log(chalk.yellow('Next steps:'));
       console.log(chalk.white('  1. Restart your AI client(s)'));
       console.log(chalk.white(`  2. The ${server.name} server should now be available`));
       if (server.documentation) {
