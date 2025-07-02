@@ -1,6 +1,6 @@
 {
   "name": "@mcp-installer/cli",
-  "version": "0.3.9",
+  "version": "0.3.10",
   "type": "module",
   "description": "CLI tool for installing MCP servers across AI clients",
   "keywords": [
