@@ -264,7 +264,11 @@ export async function installCommand(serverName: string, options: InstallOptions
 
     if (successful > 0) {
       console.log(chalk.yellow('\nNext steps:'));
-      console.log(chalk.white('  1. Restart your AI client(s)'));
+      console.log(
+        chalk.white(
+          '  1. If you are using Claude Desktop, restart it to load the new MCP server. For Gemini, Cursor, and Claude Code, restart may not be required.'
+        )
+      );
       console.log(chalk.white(`  2. The ${server.name} server should now be available`));
       if (server.documentation) {
         console.log(chalk.white(`  3. Documentation: ${server.documentation}`));
