@@ -208,7 +208,7 @@ export async function installCommand(serverName: string, options: InstallOptions
           console.log(chalk.yellow(instruction));
         });
         console.log(
-          chalk.gray('\nPlease install the missing dependencies for MCP server to work.')
+          chalk.gray('\nPlease install the missing dependencies and run the installation again.')
         );
         return;
       }
@@ -238,7 +238,7 @@ export async function installCommand(serverName: string, options: InstallOptions
         }
 
         console.log(
-          chalk.gray('\nPlease install the missing dependencies for MCP server to work.')
+          chalk.gray('\nPlease install the missing dependencies and run the installation again.')
         );
         return;
       }
