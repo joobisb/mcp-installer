@@ -96,6 +96,7 @@ describe('installCommand', () => {
       validateServerCommands: jest.fn(),
       getInstallationInstructions: jest.fn(),
       getCurrentOS: jest.fn(),
+      promptAndInstallMissingCommands: jest.fn(),
     } as any;
 
     (ServerRegistry as jest.Mock).mockImplementation(() => mockServerRegistry);
@@ -165,6 +166,12 @@ describe('installCommand', () => {
         isValid: true,
         missingCommands: [],
       });
+      mockCommandValidator.promptAndInstallMissingCommands.mockResolvedValue({
+        success: true,
+        installedCommands: [],
+        failedCommands: [],
+        userDeclined: false,
+      });
     });
 
     it('should successfully install to all clients', async () => {
@@ -205,17 +212,17 @@ describe('installCommand', () => {
       );
     });
 
-    it('should validate commands after successful installation', async () => {
+    it('should validate commands before installation and show success message', async () => {
       await installCommand('test-server', { clients: 'all' });
 
       expect(mockCommandValidator.validateServerCommands).toHaveBeenCalledWith(mockServer);
       expect(consoleSpy).toHaveBeenCalledWith(
-        chalk.green('✓ All required commands are available on your system')
+        chalk.green('\n✅ Installation completed with all dependencies verified')
       );
     });
   });
 
-  describe('command validation integration', () => {
+  describe('dependency installation integration', () => {
     beforeEach(() => {
       mockServerRegistry.getServer.mockResolvedValue(mockServer);
       mockServerRegistry.validateServer.mockResolvedValue({
@@ -232,17 +239,27 @@ describe('installCommand', () => {
       mockConfigEngine.installServer.mockResolvedValue();
     });
 
-    it('should show missing command warnings', async () => {
+    it('should successfully install missing dependencies when user agrees', async () => {
       const missingCommands = [
         {
           command: 'uvx',
           installation: {
             name: 'uv',
             description: 'Python package manager',
-            instructions: {
-              mac: ['brew install uv'],
-              linux: ['pip install uv'],
-              windows: ['pip install uv'],
+            mac: {
+              instructions: ['brew install uv'],
+              allowInstall: true,
+              installCommands: ['brew install uv'],
+            },
+            linux: {
+              instructions: ['pip install uv'],
+              allowInstall: true,
+              installCommands: ['pip install uv'],
+            },
+            windows: {
+              instructions: ['pip install uv'],
+              allowInstall: true,
+              installCommands: ['pip install uv'],
             },
           },
         },
@@ -252,27 +269,173 @@ describe('installCommand', () => {
         isValid: false,
         missingCommands,
       });
+      mockCommandValidator.promptAndInstallMissingCommands.mockResolvedValue({
+        success: true,
+        installedCommands: ['uvx'],
+        failedCommands: [],
+        userDeclined: false,
+      });
+
+      await installCommand('test-server', { clients: 'all' });
+
+      expect(mockCommandValidator.promptAndInstallMissingCommands).toHaveBeenCalledWith(
+        missingCommands,
+        expect.any(Object)
+      );
+      expect(mockConfigEngine.installServer).toHaveBeenCalledTimes(2); // Should proceed with installation
+    });
+
+    it('should stop installation when user declines dependency installation', async () => {
+      const missingCommands = [
+        {
+          command: 'uvx',
+          installation: {
+            name: 'uv',
+            description: 'Python package manager',
+            mac: {
+              instructions: ['brew install uv'],
+              allowInstall: true,
+              installCommands: ['brew install uv'],
+            },
+            linux: {
+              instructions: ['pip install uv'],
+              allowInstall: true,
+              installCommands: ['pip install uv'],
+            },
+            windows: {
+              instructions: ['pip install uv'],
+              allowInstall: true,
+              installCommands: ['pip install uv'],
+            },
+          },
+        },
+      ];
+
+      mockCommandValidator.validateServerCommands.mockReturnValue({
+        isValid: false,
+        missingCommands,
+      });
+      mockCommandValidator.promptAndInstallMissingCommands.mockResolvedValue({
+        success: false,
+        installedCommands: [],
+        failedCommands: [],
+        userDeclined: true,
+      });
       mockCommandValidator.getInstallationInstructions.mockReturnValue([
         '\n📦 Missing command: uvx',
         '   Python package manager',
         '   brew install uv',
       ]);
-      mockCommandValidator.getCurrentOS.mockReturnValue('mac');
 
       await installCommand('test-server', { clients: 'all' });
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        chalk.yellow('\n⚠️  Required commands missing on your system:')
+      expect(mockCommandValidator.promptAndInstallMissingCommands).toHaveBeenCalledWith(
+        missingCommands,
+        expect.any(Object)
       );
-      expect(consoleSpy).toHaveBeenCalledWith(chalk.yellow('\n📦 Missing command: uvx'));
+      expect(mockCommandValidator.getInstallationInstructions).toHaveBeenCalledWith(
+        missingCommands
+      );
+      expect(mockConfigEngine.installServer).not.toHaveBeenCalled(); // Should not proceed
+      expect(consoleSpy).toHaveBeenCalledWith(
+        chalk.yellow('\n❌ Installation cancelled - dependency installation declined.')
+      );
     });
 
-    it('should not show command validation for failed installations', async () => {
-      mockConfigEngine.installServer.mockRejectedValue(new Error('Installation failed'));
+    it('should stop installation when dependency installation fails', async () => {
+      const missingCommands = [
+        {
+          command: 'uvx',
+          installation: {
+            name: 'uv',
+            description: 'Python package manager',
+            mac: {
+              instructions: ['brew install uv'],
+              allowInstall: true,
+              installCommands: ['brew install uv'],
+            },
+            linux: {
+              instructions: ['pip install uv'],
+              allowInstall: true,
+              installCommands: ['pip install uv'],
+            },
+            windows: {
+              instructions: ['pip install uv'],
+              allowInstall: true,
+              installCommands: ['pip install uv'],
+            },
+          },
+        },
+      ];
+
+      mockCommandValidator.validateServerCommands.mockReturnValue({
+        isValid: false,
+        missingCommands,
+      });
+      mockCommandValidator.promptAndInstallMissingCommands.mockResolvedValue({
+        success: false,
+        installedCommands: [],
+        failedCommands: [{ command: 'uvx', error: 'Installation failed' }],
+        userDeclined: false,
+      });
+      mockCommandValidator.getInstallationInstructions.mockReturnValue([
+        '\n📦 Missing command: uvx',
+        '   Python package manager',
+        '   brew install uv',
+      ]);
 
       await installCommand('test-server', { clients: 'all' });
 
-      expect(mockCommandValidator.validateServerCommands).not.toHaveBeenCalled();
+      expect(mockCommandValidator.promptAndInstallMissingCommands).toHaveBeenCalledWith(
+        missingCommands,
+        expect.any(Object)
+      );
+      expect(mockConfigEngine.installServer).not.toHaveBeenCalled(); // Should not proceed
+      expect(consoleSpy).toHaveBeenCalledWith(
+        chalk.red('\n❌ Some dependencies failed to install automatically.')
+      );
+    });
+
+    it('should show dependency check in dry run mode', async () => {
+      const missingCommands = [
+        {
+          command: 'uvx',
+          installation: {
+            name: 'uv',
+            description: 'Python package manager',
+            mac: {
+              instructions: ['brew install uv'],
+              allowInstall: true,
+              installCommands: ['brew install uv'],
+            },
+            linux: {
+              instructions: ['pip install uv'],
+              allowInstall: true,
+              installCommands: ['pip install uv'],
+            },
+            windows: {
+              instructions: ['pip install uv'],
+              allowInstall: false,
+              installCommands: [],
+            },
+          },
+        },
+      ];
+
+      mockCommandValidator.validateServerCommands.mockReturnValue({
+        isValid: false,
+        missingCommands,
+      });
+      mockCommandValidator.getCurrentOS.mockReturnValue('mac');
+
+      await installCommand('test-server', { clients: 'all', dryRun: true });
+
+      expect(mockCommandValidator.validateServerCommands).toHaveBeenCalledWith(mockServer);
+      expect(mockCommandValidator.promptAndInstallMissingCommands).not.toHaveBeenCalled(); // Should not prompt in dry run
+      expect(consoleSpy).toHaveBeenCalledWith(chalk.yellow('\n🔧 Dependency check (dry run):'));
+      expect(consoleSpy).toHaveBeenCalledWith(
+        chalk.yellow('  • uvx: missing (would attempt auto-install)')
+      );
     });
   });
 
@@ -289,6 +452,12 @@ describe('installCommand', () => {
       mockCommandValidator.validateServerCommands.mockReturnValue({
         isValid: true,
         missingCommands: [],
+      });
+      mockCommandValidator.promptAndInstallMissingCommands.mockResolvedValue({
+        success: true,
+        installedCommands: [],
+        failedCommands: [],
+        userDeclined: false,
       });
     });
 
@@ -346,6 +515,10 @@ describe('installCommand', () => {
       mockParameterHandler.substituteParameters.mockReturnValue({
         args: ['test-package'],
         env: { TEST_ENV: 'value' },
+      });
+      mockCommandValidator.validateServerCommands.mockReturnValue({
+        isValid: true,
+        missingCommands: [],
       });
     });
 
@@ -427,6 +600,16 @@ describe('installCommand', () => {
         args: ['test-package'],
         env: undefined,
       });
+      mockCommandValidator.validateServerCommands.mockReturnValue({
+        isValid: true,
+        missingCommands: [],
+      });
+      mockCommandValidator.promptAndInstallMissingCommands.mockResolvedValue({
+        success: true,
+        installedCommands: [],
+        failedCommands: [],
+        userDeclined: false,
+      });
 
       mockConfigEngine.installServer
         .mockResolvedValueOnce() // Success for first client
@@ -482,6 +665,12 @@ describe('installCommand', () => {
       mockCommandValidator.validateServerCommands.mockReturnValue({
         isValid: true,
         missingCommands: [],
+      });
+      mockCommandValidator.promptAndInstallMissingCommands.mockResolvedValue({
+        success: true,
+        installedCommands: [],
+        failedCommands: [],
+        userDeclined: false,
       });
       (inquirer.prompt as jest.Mock).mockResolvedValue({ proceed: true });
 

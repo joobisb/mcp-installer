@@ -12,3 +12,9 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+# Sitemap
+Sitemap: https://www.mcp-installer.com/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1

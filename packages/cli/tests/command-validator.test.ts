@@ -3,12 +3,14 @@ import { MCPServer } from '@mcp-installer/shared';
 import { execSync } from 'child_process';
 import os from 'os';
 
-// Mock child_process
+// Mock dependencies
 jest.mock('child_process');
 jest.mock('os', () => ({
   platform: jest.fn(),
   arch: jest.fn(),
 }));
+jest.mock('inquirer');
+jest.mock('ora');
 
 const mockExecSync = execSync as jest.MockedFunction<typeof execSync>;
 const mockPlatform = os.platform as jest.MockedFunction<typeof os.platform>;
@@ -180,18 +182,30 @@ describe('CommandValidator', () => {
         installation: {
           name: 'uv (Python package manager)',
           description: 'Modern Python package and project manager',
-          instructions: {
-            mac: [
+          mac: {
+            instructions: [
               'Install via Homebrew: brew install uv',
               'Or via curl: curl -LsSf https://astral.sh/uv/install.sh | sh',
             ],
-            linux: [
+            allowInstall: true,
+            installCommands: ['brew install uv'],
+          },
+          linux: {
+            instructions: [
               'Install via curl: curl -LsSf https://astral.sh/uv/install.sh | sh',
               'Or via pip: pip install uv',
             ],
-            windows: [
+            allowInstall: true,
+            installCommands: ['curl -LsSf https://astral.sh/uv/install.sh | sh'],
+          },
+          windows: {
+            instructions: [
               'Install via PowerShell: powershell -c "irm https://astral.sh/uv/install.ps1 | iex"',
               'Or via Scoop: scoop install uv',
+            ],
+            allowInstall: true,
+            installCommands: [
+              'powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"',
             ],
           },
         },
@@ -243,10 +257,20 @@ describe('CommandValidator', () => {
           installation: {
             name: 'Docker',
             description: 'Container platform',
-            instructions: {
-              mac: ['Install Docker Desktop from https://docker.com/'],
-              linux: ['Install Docker Engine: sudo apt install docker.io'],
-              windows: ['Install Docker Desktop from https://docker.com/'],
+            mac: {
+              instructions: ['Install Docker Desktop from https://docker.com/'],
+              allowInstall: false,
+              installCommands: [],
+            },
+            linux: {
+              instructions: ['Install Docker Engine: sudo apt install docker.io'],
+              allowInstall: false,
+              installCommands: [],
+            },
+            windows: {
+              instructions: ['Install Docker Desktop from https://docker.com/'],
+              allowInstall: false,
+              installCommands: [],
             },
           },
         },
@@ -302,11 +326,27 @@ describe('CommandValidator', () => {
         if (command !== 'unknown-command') {
           expect(result.missingCommands).toHaveLength(1);
           expect(result.missingCommands[0].installation.name).toBeDefined();
-          expect(result.missingCommands[0].installation.instructions.mac).toBeDefined();
-          expect(result.missingCommands[0].installation.instructions.linux).toBeDefined();
-          expect(result.missingCommands[0].installation.instructions.windows).toBeDefined();
+          expect(result.missingCommands[0].installation.mac.instructions).toBeDefined();
+          expect(result.missingCommands[0].installation.linux.instructions).toBeDefined();
+          expect(result.missingCommands[0].installation.windows.instructions).toBeDefined();
+          expect(result.missingCommands[0].installation.mac.allowInstall).toBeDefined();
+          expect(result.missingCommands[0].installation.linux.allowInstall).toBeDefined();
+          expect(result.missingCommands[0].installation.windows.allowInstall).toBeDefined();
+          expect(result.missingCommands[0].installation.mac.installCommands).toBeDefined();
+          expect(result.missingCommands[0].installation.linux.installCommands).toBeDefined();
+          expect(result.missingCommands[0].installation.windows.installCommands).toBeDefined();
         }
       });
     });
+  });
+
+  describe('promptAndInstallMissingCommands', () => {
+    it('should have the method defined', () => {
+      expect(typeof commandValidator.promptAndInstallMissingCommands).toBe('function');
+    });
+
+    // TODO: Add comprehensive tests for promptAndInstallMissingCommands method
+    // These tests require complex mocking of ora, inquirer, and execSync
+    // For now, we verify the method exists and integration tests will validate the functionality
   });
 });

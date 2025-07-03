@@ -108,6 +108,8 @@ export async function installCommand(serverName: string, options: InstallOptions
       );
     }
 
+    // Skip dependency check here - will be done later after configuration
+
     // Handle parameter prompting
     spinner.stop();
     let parameterValues = {};
@@ -136,6 +138,11 @@ export async function installCommand(serverName: string, options: InstallOptions
 
     if (options.dryRun) {
       const { args, env } = parameterHandler.substituteParameters(server, parameterValues);
+
+      // Show dependency check in dry run mode
+      const commandValidator = new CommandValidator();
+      const dependencyValidation = commandValidator.validateServerCommands(server);
+
       spinner.succeed(chalk.green('Dry run completed successfully'));
       console.log(chalk.cyan('Would install:'));
       console.log(chalk.white(`  Server: ${server.name} (${server.id})`));
@@ -150,10 +157,102 @@ export async function installCommand(serverName: string, options: InstallOptions
           )
         );
       }
+
+      // Show dependency status in dry run
+      if (!dependencyValidation.isValid) {
+        console.log(chalk.yellow('\n🔧 Dependency check (dry run):'));
+        dependencyValidation.missingCommands.forEach(({ command, installation }) => {
+          const currentOS = commandValidator.getCurrentOS();
+          const canAutoInstall = installation[currentOS].allowInstall;
+          const status = canAutoInstall
+            ? 'would attempt auto-install'
+            : 'requires manual installation';
+          console.log(chalk.yellow(`  • ${command}: missing (${status})`));
+        });
+      } else {
+        console.log(chalk.green('\n✓ All system dependencies are available'));
+      }
+
       return;
     }
 
-    console.log(chalk.cyan(`Installing ${server.name} to ${targetClients.length} client(s)...`));
+    console.log(
+      chalk.cyan(
+        `\n🎯 Configuration complete! Now checking system dependencies for ${server.name}...`
+      )
+    );
+
+    // Check for required dependencies before installation
+    spinner.text = 'Checking system dependencies...';
+    const commandValidator = new CommandValidator();
+    const dependencyValidation = commandValidator.validateServerCommands(server);
+
+    if (!dependencyValidation.isValid) {
+      // Stop spinner before user interaction but keep reference for installation
+      spinner.stop();
+
+      const installResult = await commandValidator.promptAndInstallMissingCommands(
+        dependencyValidation.missingCommands,
+        spinner // Pass the spinner for reuse during installation
+      );
+
+      if (installResult.userDeclined) {
+        console.log(
+          chalk.yellow('\n❌ Installation cancelled - dependency installation declined.')
+        );
+        console.log(chalk.yellow('\nManual installation instructions:'));
+        const instructions = commandValidator.getInstallationInstructions(
+          dependencyValidation.missingCommands
+        );
+        instructions.forEach((instruction) => {
+          console.log(chalk.yellow(instruction));
+        });
+        console.log(
+          chalk.gray('\nPlease install the missing dependencies for MCP server to work.')
+        );
+        return;
+      }
+
+      if (!installResult.success) {
+        console.log(chalk.red('\n❌ Some dependencies failed to install automatically.'));
+
+        if (installResult.failedCommands.length > 0) {
+          console.log(chalk.yellow('\nFailed to install:'));
+          installResult.failedCommands.forEach(({ command, error }) => {
+            console.log(chalk.red(`  • ${command}: ${error}`));
+          });
+
+          const failedInstallations = dependencyValidation.missingCommands.filter(({ command }) =>
+            installResult.failedCommands.some((failed) => failed.command === command)
+          );
+
+          if (failedInstallations.length > 0) {
+            console.log(
+              chalk.yellow('\nManual installation instructions for failed dependencies:')
+            );
+            const instructions = commandValidator.getInstallationInstructions(failedInstallations);
+            instructions.forEach((instruction) => {
+              console.log(chalk.yellow(instruction));
+            });
+          }
+        }
+
+        console.log(
+          chalk.gray('\nPlease install the missing dependencies for MCP server to work.')
+        );
+        return;
+      }
+
+      // Add transition message after successful dependency installation
+      if (installResult.success && installResult.installedCommands.length > 0) {
+        console.log(
+          chalk.cyan('\n✅ Dependencies installed! Now proceeding with MCP server configuration...')
+        );
+      }
+    } else {
+      spinner.succeed(chalk.green('All system dependencies are available'));
+      console.log(chalk.cyan('\n🚀 Proceeding with MCP server installation...'));
+    }
 
     if (server.requiresAuth && server.installation.env) {
       console.log(
@@ -232,34 +331,9 @@ export async function installCommand(serverName: string, options: InstallOptions
       console.log(chalk.red(`  ✗ Failed: ${failed}`));
     }
 
-    // Validate required commands are available
+    // Final dependency confirmation
     if (successful > 0) {
-      console.log(chalk.cyan('\nValidating system requirements...'));
-      const commandValidator = new CommandValidator();
-      const validation = commandValidator.validateServerCommands(server);
-
-      if (!validation.isValid) {
-        console.log(chalk.yellow('\n⚠️  Required commands missing on your system:'));
-        console.log(
-          chalk.red('   The server was configured but may not work without these dependencies.\n')
-        );
-
-        const instructions = commandValidator.getInstallationInstructions(
-          validation.missingCommands
-        );
-        instructions.forEach((instruction) => {
-          console.log(chalk.yellow(instruction));
-        });
-
-        console.log(
-          chalk.cyan(`\n🔍 System Info: ${commandValidator.getCurrentOS()} (${process.platform})`)
-        );
-        console.log(
-          chalk.gray('   After installing missing commands, the MCP server should work properly.')
-        );
-      } else {
-        console.log(chalk.green('✓ All required commands are available on your system'));
-      }
+      console.log(chalk.green('\n✅ Installation completed with all dependencies verified'));
     }
 
     if (successful > 0) {
