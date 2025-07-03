@@ -166,16 +166,24 @@ describe('ClientManager', () => {
     });
 
     it('should not auto-create config for clients without autoCreateConfig', async () => {
-      // Setup: .claude directory exists but config doesn't
+      // Setup: .gemini directory exists but config doesn't
       vol.fromJSON({
-        '/Users/test/.claude/': null, // Directory exists but empty
+        '/Users/test/.gemini/': null, // Directory exists but empty
       });
 
-      const client = await clientManager.detectClient('claude-desktop');
+      // Mock execSync to simulate gemini command not found
+      const mockExecSync = jest.spyOn(require('child_process'), 'execSync');
+      mockExecSync.mockImplementation(() => {
+        throw new Error('Command not found');
+      });
 
-      expect(client.type).toBe('claude-desktop');
+      const client = await clientManager.detectClient('gemini');
+
+      expect(client.type).toBe('gemini');
       expect(client.isInstalled).toBe(false);
-      expect(client.configExists).toBe(false); // No auto-creation for claude-desktop
+      expect(client.configExists).toBe(false); // No auto-creation for gemini
+
+      mockExecSync.mockRestore();
     });
 
     it('should not auto-create config when parent directory does not exist', async () => {

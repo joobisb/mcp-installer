@@ -21,6 +21,10 @@ export class ClientManager {
         join(homedir(), '.claude', 'claude_desktop_config.json'), // Linux
         join(homedir(), 'AppData', 'Roaming', 'Claude', 'claude_desktop_config.json'), // Windows
       ],
+      autoCreateConfig: true,
+      configTemplate: {
+        mcpServers: {},
+      },
     },
     cursor: {
       name: 'Cursor',
@@ -35,6 +39,7 @@ export class ClientManager {
       name: 'Gemini',
       configPaths: [join(homedir(), '.gemini', 'settings.json')], //TODO: Verify for linux and Windows
       detectCommand: 'gemini',
+      //settings.json already exists for geming, so no need to auto-create config
     },
     'claude-code': {
       name: 'Claude Code',
@@ -42,6 +47,7 @@ export class ClientManager {
         join(homedir(), '.claude.json'), // Global configuration TODO: Verify for linux and Windows
       ],
       detectCommand: 'claude',
+      //claude.json already exists for claude-code, so no need to auto-create config
     },
   };
 

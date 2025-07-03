@@ -90,7 +90,7 @@ export class ParameterHandler {
     };
 
     if (param.placeholder) {
-      promptConfig.message += chalk.gray(` (e.g., ${param.placeholder})`);
+      promptConfig.message += chalk.gray(`\n  (e.g., ${param.placeholder})`);
     }
 
     if (param.type === 'boolean') {
@@ -259,7 +259,7 @@ export class ParameterHandler {
    * Replace {{parameter_name}} placeholders with actual values
    */
   private substitutePlaceholders(template: string, values: ParameterValues): string {
-    return template.replace(/\{\{([^}]+)\}\}/g, (match, paramName) => {
+    return template.replace(/\{\{([^}]+)\}\}/g, (_, paramName) => {
       return values[paramName] || '';
     });
   }
