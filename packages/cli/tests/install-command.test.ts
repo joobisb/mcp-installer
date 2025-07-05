@@ -83,6 +83,7 @@ describe('installCommand', () => {
 
     mockConfigEngine = {
       installServer: jest.fn(),
+      isServerInstalled: jest.fn(),
     } as any;
 
     mockParameterHandler = {
@@ -162,6 +163,7 @@ describe('installCommand', () => {
         env: undefined,
       });
       mockConfigEngine.installServer.mockResolvedValue();
+      mockConfigEngine.isServerInstalled.mockResolvedValue(false); // Server not already installed
       mockCommandValidator.validateServerCommands.mockReturnValue({
         isValid: true,
         missingCommands: [],
@@ -449,6 +451,7 @@ describe('installCommand', () => {
       });
       mockClientManager.detectInstalledClients.mockResolvedValue(mockClients);
       mockConfigEngine.installServer.mockResolvedValue();
+      mockConfigEngine.isServerInstalled.mockResolvedValue(false); // Server not already installed
       mockCommandValidator.validateServerCommands.mockReturnValue({
         isValid: true,
         missingCommands: [],
@@ -635,6 +638,108 @@ describe('installCommand', () => {
     });
   });
 
+  describe('already installed checks', () => {
+    beforeEach(() => {
+      mockServerRegistry.getServer.mockResolvedValue(mockServer);
+      mockServerRegistry.validateServer.mockResolvedValue({
+        isValid: true,
+        errors: [],
+        warnings: [],
+      });
+      mockClientManager.detectInstalledClients.mockResolvedValue(mockClients);
+    });
+
+    it('should detect already installed server and stop early', async () => {
+      mockConfigEngine.isServerInstalled.mockResolvedValue(true); // Server already installed
+
+      await installCommand('test-server', { clients: 'all' });
+
+      expect(mockConfigEngine.isServerInstalled).toHaveBeenCalledWith(
+        '/test/claude.json',
+        'test-server'
+      );
+      expect(mockConfigEngine.isServerInstalled).toHaveBeenCalledWith(
+        '/test/cursor.json',
+        'test-server'
+      );
+      expect(mockParameterHandler.hasParameters).not.toHaveBeenCalled(); // Should not proceed to parameter collection
+      expect(mockConfigEngine.installServer).not.toHaveBeenCalled(); // Should not proceed to installation
+      expect(consoleSpy).toHaveBeenCalledWith(
+        chalk.gray('\nUse --force to overwrite existing installation.')
+      );
+    });
+
+    it('should proceed with installation when force flag is used', async () => {
+      mockConfigEngine.isServerInstalled.mockResolvedValue(true); // Server already installed
+      mockParameterHandler.hasParameters.mockReturnValue(false);
+      mockParameterHandler.substituteParameters.mockReturnValue({
+        args: ['test-package'],
+        env: undefined,
+      });
+      mockConfigEngine.installServer.mockResolvedValue();
+      mockCommandValidator.validateServerCommands.mockReturnValue({
+        isValid: true,
+        missingCommands: [],
+      });
+      mockCommandValidator.promptAndInstallMissingCommands.mockResolvedValue({
+        success: true,
+        installedCommands: [],
+        failedCommands: [],
+        userDeclined: false,
+      });
+
+      await installCommand('test-server', { clients: 'all', force: true });
+
+      expect(mockConfigEngine.isServerInstalled).not.toHaveBeenCalled(); // Should skip already installed check
+      expect(mockConfigEngine.installServer).toHaveBeenCalledTimes(2); // Should proceed with installation
+    });
+
+    it('should handle mixed installation states correctly', async () => {
+      // Server installed on first client, not on second
+      mockConfigEngine.isServerInstalled
+        .mockResolvedValueOnce(true) // Claude Desktop - already installed
+        .mockResolvedValueOnce(false); // Cursor - not installed
+      mockParameterHandler.hasParameters.mockReturnValue(false);
+      mockParameterHandler.substituteParameters.mockReturnValue({
+        args: ['test-package'],
+        env: undefined,
+      });
+      mockConfigEngine.installServer.mockResolvedValue();
+      mockCommandValidator.validateServerCommands.mockReturnValue({
+        isValid: true,
+        missingCommands: [],
+      });
+      mockCommandValidator.promptAndInstallMissingCommands.mockResolvedValue({
+        success: true,
+        installedCommands: [],
+        failedCommands: [],
+        userDeclined: false,
+      });
+
+      await installCommand('test-server', { clients: 'all' });
+
+      expect(consoleSpy).toHaveBeenCalledWith(chalk.yellow('  • Claude-desktop')); // Shows already installed
+      expect(consoleSpy).toHaveBeenCalledWith(chalk.cyan('  • Cursor')); // Shows continuing with this one
+      expect(mockConfigEngine.installServer).toHaveBeenCalledTimes(1); // Should proceed with Cursor only
+      expect(consoleSpy).toHaveBeenCalledWith(chalk.yellow('  ⚠ Skipped: 1 (already installed)')); // Summary shows skipped
+    });
+
+    it('should stop when all clients already have the server', async () => {
+      // All clients already have the server
+      mockConfigEngine.isServerInstalled.mockResolvedValue(true);
+
+      await installCommand('test-server', { clients: 'all' });
+
+      expect(mockSpinner.warn).toHaveBeenCalledWith(
+        chalk.yellow(`Server 'Test Server' is already installed on all target clients:`)
+      );
+      expect(consoleSpy).toHaveBeenCalledWith(chalk.yellow('  • Claude-desktop'));
+      expect(consoleSpy).toHaveBeenCalledWith(chalk.yellow('  • Cursor'));
+      expect(mockParameterHandler.hasParameters).not.toHaveBeenCalled(); // Should not proceed to parameter collection
+      expect(mockConfigEngine.installServer).not.toHaveBeenCalled(); // Should not proceed to installation
+    });
+  });
+
   describe('authentication warnings', () => {
     it('should show authentication warning for servers requiring auth', async () => {
       const authServer = {
@@ -662,6 +767,7 @@ describe('installCommand', () => {
         env: { API_KEY: 'value' },
       });
       mockConfigEngine.installServer.mockResolvedValue();
+      mockConfigEngine.isServerInstalled.mockResolvedValue(false); // Server not already installed
       mockCommandValidator.validateServerCommands.mockReturnValue({
         isValid: true,
         missingCommands: [],

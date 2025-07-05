@@ -19,6 +19,7 @@ interface InstallOptions {
 
 export async function installCommand(serverName: string, options: InstallOptions): Promise<void> {
   const spinner = ora('Initializing installation...').start();
+  let skippedClients: string[] = []; // Track clients that were skipped (already installed)
 
   try {
     const serverRegistry = new ServerRegistry();
@@ -108,7 +109,62 @@ export async function installCommand(serverName: string, options: InstallOptions
       );
     }
 
-    // Skip dependency check here - will be done later after configuration
+    // Check if server is already installed on target clients (unless force flag is used)
+    if (!options.force) {
+      spinner.text = 'Checking if server is already installed...';
+      const configEngine = new ConfigEngine();
+      const alreadyInstalled: string[] = [];
+      const clientsToInstall: ClientType[] = [];
+
+      // Check each target client and filter out already installed ones
+      for (const clientType of targetClients) {
+        const clientInfo = allClients.find((c) => c.type === clientType);
+        if (clientInfo?.isInstalled && clientInfo?.configExists) {
+          if (await configEngine.isServerInstalled(clientInfo.configPath, server.id)) {
+            alreadyInstalled.push(getClientDisplayName(clientType));
+          } else {
+            clientsToInstall.push(clientType);
+          }
+        } else {
+          // Client not installed or config doesn't exist, but still add to install list
+          // (the installation loop will handle the actual error)
+          clientsToInstall.push(clientType);
+        }
+      }
+
+      // Handle different scenarios
+      if (alreadyInstalled.length > 0 && clientsToInstall.length === 0) {
+        // All clients already have the server - stop completely
+        spinner.warn(
+          chalk.yellow(`Server '${server.name}' is already installed on all target clients:`)
+        );
+        alreadyInstalled.forEach((clientName) => {
+          console.log(chalk.yellow(`  • ${clientName}`));
+        });
+        console.log(chalk.gray('\nUse --force to overwrite existing installation.'));
+        return;
+      } else if (alreadyInstalled.length > 0) {
+        // Some clients have it, some don't - show status and continue with remaining
+        spinner.warn(chalk.yellow(`Server '${server.name}' is already installed on:`));
+        alreadyInstalled.forEach((clientName) => {
+          console.log(chalk.yellow(`  • ${clientName}`));
+        });
+        console.log(chalk.cyan('\n✓ Continuing installation for remaining clients:'));
+        clientsToInstall.forEach((clientType) => {
+          console.log(chalk.cyan(`  • ${getClientDisplayName(clientType)}`));
+        });
+
+        // Update targetClients to only include clients that need installation
+        targetClients = clientsToInstall;
+        spinner.start('Proceeding with installation for remaining clients...');
+      } else {
+        // No clients have it - proceed normally
+        spinner.succeed(chalk.green('Server not yet installed - proceeding with installation'));
+      }
+
+      // Store skipped clients for the summary
+      skippedClients = alreadyInstalled;
+    }
 
     // Handle parameter prompting
     spinner.stop();
@@ -329,6 +385,9 @@ export async function installCommand(serverName: string, options: InstallOptions
     console.log(chalk.green(`  ✓ Successful: ${successful}`));
     if (failed > 0) {
       console.log(chalk.red(`  ✗ Failed: ${failed}`));
+    }
+    if (skippedClients.length > 0) {
+      console.log(chalk.yellow(`  ⚠ Skipped: ${skippedClients.length} (already installed)`));
     }
 
     // Final dependency confirmation

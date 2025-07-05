@@ -81,6 +81,18 @@ export class ConfigEngine {
     }
   }
 
+  /**
+   * Check if a server is already installed in a client config
+   */
+  async isServerInstalled(configPath: string, serverId: string): Promise<boolean> {
+    try {
+      const config = await this.readConfig(configPath);
+      return !!config.mcpServers[serverId];
+    } catch {
+      return false;
+    }
+  }
+
   async installServer(
     configPath: string,
     serverId: string,

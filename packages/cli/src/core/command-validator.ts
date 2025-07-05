@@ -1,4 +1,4 @@
-import { execSync } from 'child_process';
+import { execSync, spawn } from 'child_process';
 import os from 'os';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
@@ -355,8 +355,28 @@ export class CommandValidator {
     const installedCommands: string[] = [];
     const failedCommands: Array<{ command: string; error: string }> = [];
 
+    // Show installation summary
+    if (installableCommands.length > 0) {
+      console.log(
+        chalk.cyan(
+          `\n🔧 Installing ${installableCommands.length} missing ${installableCommands.length === 1 ? 'dependency' : 'dependencies'}:`
+        )
+      );
+      installableCommands.forEach(({ command, installation }) => {
+        const estimatedTime = this.getInstallationTimeEstimate(command, currentOS);
+        console.log(
+          chalk.gray(
+            `   • ${command} (${installation.description}) ${estimatedTime ? `~${estimatedTime}` : ''}`
+          )
+        );
+      });
+      console.log('');
+    }
+
     for (const { command, installation } of installableCommands) {
       const installCommands = installation[currentOS].installCommands;
+
+      console.log(chalk.cyan(`\n📦 Installing ${command}...`));
 
       for (const installCommand of installCommands) {
         // Use parent spinner if available, otherwise create new one
@@ -370,19 +390,41 @@ export class CommandValidator {
         }
 
         try {
-          execSync(installCommand, { stdio: 'pipe' });
+          // Show the command being executed (but hide sensitive parts)
+          const displayCommand =
+            installCommand.length > 80 ? installCommand.substring(0, 77) + '...' : installCommand;
+          console.log(chalk.gray(`   Running: ${displayCommand}`));
 
-          // Verify installation
-          if (this.isCommandAvailable(command)) {
-            spinner.succeed(chalk.green(`Successfully installed ${command}`));
-            installedCommands.push(command);
-            break; // Move to next command
+          // Use streaming execution
+          const result = await this.executeCommandWithOutput(installCommand, spinner, command);
+
+          if (result.success) {
+            // Verify installation
+            if (this.isCommandAvailable(command)) {
+              spinner.succeed(chalk.green(`✅ Successfully installed ${command}`));
+              installedCommands.push(command);
+              break; // Move to next command
+            } else {
+              throw new Error('Command not available after installation');
+            }
           } else {
-            throw new Error('Command not available after installation');
+            throw new Error(result.error || 'Installation failed');
           }
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-          spinner.fail(chalk.red(`Failed to install ${command}: ${errorMessage}`));
+          spinner.fail(chalk.red(`❌ Failed to install ${command}`));
+
+          // Show error details with better formatting
+          console.log(chalk.red(`   Error: ${errorMessage}`));
+
+          // Add troubleshooting suggestions based on command type
+          const suggestions = this.getTroubleshootingSuggestions(command, currentOS);
+          if (suggestions.length > 0) {
+            console.log(chalk.yellow(`   💡 Suggestions:`));
+            suggestions.forEach((suggestion) => {
+              console.log(chalk.yellow(`      • ${suggestion}`));
+            });
+          }
 
           // Only add to failed commands after all install commands for this command have been tried
           if (installCommand === installCommands[installCommands.length - 1]) {
@@ -406,6 +448,282 @@ export class CommandValidator {
       failedCommands,
       userDeclined: false,
     };
+  }
+
+  /**
+   * Get estimated installation time for a command
+   */
+  private getInstallationTimeEstimate(command: string, os: string): string {
+    const estimates: Record<string, Record<string, string>> = {
+      npx: { mac: '30s', linux: '30s', windows: '45s' },
+      node: { mac: '2-3min', linux: '1-2min', windows: '3-5min' },
+      npm: { mac: '1min', linux: '1min', windows: '2min' },
+      uvx: { mac: '1-2min', linux: '1-2min', windows: '2-3min' },
+      uv: { mac: '1-2min', linux: '1-2min', windows: '2-3min' },
+      pip: { mac: '30s', linux: '30s', windows: '1min' },
+      docker: { mac: '5-10min', linux: '3-5min', windows: '5-10min' },
+    };
+
+    return estimates[command]?.[os] || '';
+  }
+
+  /**
+   * Extract meaningful progress information from command output
+   */
+  private extractMeaningfulProgress(line: string): string | null {
+    if (!line || line.length > 80) return null;
+
+    // Common progress patterns
+    const progressPatterns = [
+      /downloading.*?(\d+(?:\.\d+)?(?:MB|KB|GB))/i,
+      /installing.*?(\w+)/i,
+      /fetching.*?(\w+)/i,
+      /resolving.*?(\w+)/i,
+      /building.*?(\w+)/i,
+      /extracting.*?(\w+)/i,
+      /(\d+%)/,
+      /(successfully|complete|done|finished)/i,
+    ];
+
+    for (const pattern of progressPatterns) {
+      const match = line.match(pattern);
+      if (match) {
+        // Return cleaned up version
+        return line.length <= 50 ? line : match[0];
+      }
+    }
+
+    // Filter out noise
+    const noisePatterns = [/^\s*$/, /^[=\-+>]+$/, /warning:/i, /debug:/i, /verbose:/i];
+
+    for (const pattern of noisePatterns) {
+      if (pattern.test(line)) return null;
+    }
+
+    // Return line if it's reasonably short and meaningful
+    return line.length <= 50 ? line : null;
+  }
+
+  /**
+   * Get troubleshooting suggestions for failed installations
+   */
+  private getTroubleshootingSuggestions(command: string, os: string): string[] {
+    const suggestions: Record<string, Record<string, string[]>> = {
+      npx: {
+        mac: ['Install Node.js from nodejs.org', 'Run: brew install node'],
+        linux: [
+          'Install Node.js: sudo apt install nodejs npm',
+          'Or use: curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -',
+        ],
+        windows: ['Install Node.js from nodejs.org', 'Or use: winget install OpenJS.NodeJS'],
+      },
+      node: {
+        mac: ['Run: brew install node', 'Download from nodejs.org'],
+        linux: ['Run: sudo apt install nodejs', 'Or use NodeSource repository'],
+        windows: ['Download from nodejs.org', 'Or use: winget install OpenJS.NodeJS'],
+      },
+      npm: {
+        mac: ['Usually comes with Node.js - reinstall Node.js', 'Run: brew install node'],
+        linux: ['Run: sudo apt install npm', 'Or reinstall Node.js'],
+        windows: ['Usually comes with Node.js - reinstall Node.js'],
+      },
+      uvx: {
+        mac: [
+          'Install uv first: brew install uv',
+          'Or: curl -LsSf https://astral.sh/uv/install.sh | sh',
+        ],
+        linux: [
+          'Install uv: curl -LsSf https://astral.sh/uv/install.sh | sh',
+          'Add ~/.local/bin to PATH',
+        ],
+        windows: ['Install uv: powershell -c "irm https://astral.sh/uv/install.ps1 | iex"'],
+      },
+      uv: {
+        mac: ['Run: brew install uv', 'Or: curl -LsSf https://astral.sh/uv/install.sh | sh'],
+        linux: ['Run: curl -LsSf https://astral.sh/uv/install.sh | sh', 'Add ~/.local/bin to PATH'],
+        windows: ['Run: powershell -c "irm https://astral.sh/uv/install.ps1 | iex"'],
+      },
+      pip: {
+        mac: ['Install Python 3: brew install python3', 'Python 3 includes pip'],
+        linux: ['Install: sudo apt install python3-pip', 'Or: sudo yum install python3-pip'],
+        windows: [
+          'Install Python from python.org (includes pip)',
+          'Or: winget install Python.Python.3',
+        ],
+      },
+      docker: {
+        mac: ['Install Docker Desktop from docker.com', 'Or: brew install --cask docker'],
+        linux: [
+          'Install: sudo apt install docker.io',
+          'Add user to docker group: sudo usermod -aG docker $USER',
+        ],
+        windows: ['Install Docker Desktop from docker.com', 'Enable WSL2 if required'],
+      },
+    };
+
+    return (
+      suggestions[command]?.[os] || [
+        'Check if the installer is available on your system',
+        'Verify your internet connection',
+        'Try running with administrator privileges',
+      ]
+    );
+  }
+
+  /**
+   * Extract meaningful error information from command output
+   */
+  private extractMeaningfulError(fullError: string, commandName: string): string {
+    if (!fullError) return `Failed to install ${commandName}`;
+
+    // Common error patterns with suggestions
+    const errorPatterns = [
+      {
+        pattern: /permission denied|access denied/i,
+        message: 'Permission denied - try running with sudo or as administrator',
+      },
+      {
+        pattern: /command not found|not recognized/i,
+        message: 'Command not found - the installer may not be available on your system',
+      },
+      {
+        pattern: /network|connection|timeout|unreachable/i,
+        message: 'Network error - check your internet connection and try again',
+      },
+      {
+        pattern: /disk|space|storage/i,
+        message: 'Insufficient disk space - free up some space and try again',
+      },
+      {
+        pattern: /already exists|already installed/i,
+        message: 'Already installed but not detected - check your PATH environment',
+      },
+      {
+        pattern: /certificate|ssl|tls/i,
+        message: 'SSL/Certificate error - check your system time and certificates',
+      },
+    ];
+
+    // Check for known error patterns
+    for (const { pattern, message } of errorPatterns) {
+      if (pattern.test(fullError)) {
+        return message;
+      }
+    }
+
+    // Extract first meaningful error line
+    const lines = fullError
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line);
+    for (const line of lines) {
+      if (
+        line.toLowerCase().includes('error') ||
+        line.toLowerCase().includes('failed') ||
+        line.toLowerCase().includes('cannot') ||
+        line.toLowerCase().includes('unable')
+      ) {
+        return line.length > 120 ? line.substring(0, 117) + '...' : line;
+      }
+    }
+
+    // Return first non-empty line if no specific error found
+    const firstLine = lines[0];
+    if (firstLine) {
+      return firstLine.length > 120 ? firstLine.substring(0, 117) + '...' : firstLine;
+    }
+
+    return `Installation failed for ${commandName}`;
+  }
+
+  /**
+   * Execute command with real-time output streaming
+   */
+  private async executeCommandWithOutput(
+    command: string,
+    spinner: any,
+    commandName: string
+  ): Promise<{ success: boolean; error?: string }> {
+    return new Promise((resolve) => {
+      spinner.text = `Installing ${commandName}...`;
+
+      // Use shell mode for complex commands (with pipes, redirects, etc)
+      const child = spawn(command, {
+        stdio: ['ignore', 'pipe', 'pipe'],
+        shell: true,
+      });
+
+      let outputBuffer = '';
+      let errorBuffer = '';
+
+      // Handle stdout
+      child.stdout?.on('data', (data) => {
+        const output = data.toString();
+        outputBuffer += output;
+
+        // Update spinner with last meaningful line
+        const lines = output
+          .trim()
+          .split('\n')
+          .filter((line: string) => line.trim());
+        if (lines.length > 0) {
+          const lastLine = lines[lines.length - 1].trim();
+          const meaningfulUpdate = this.extractMeaningfulProgress(lastLine);
+          if (meaningfulUpdate) {
+            spinner.text = `Installing ${commandName}: ${meaningfulUpdate}`;
+          }
+        }
+      });
+
+      // Handle stderr
+      child.stderr?.on('data', (data) => {
+        const error = data.toString();
+        errorBuffer += error;
+
+        // Some installers output progress to stderr, so show it too
+        const lines = error
+          .trim()
+          .split('\n')
+          .filter((line: string) => line.trim());
+        if (lines.length > 0) {
+          const lastLine = lines[lines.length - 1].trim();
+          // Only show stderr if it's not an error message
+          if (
+            !lastLine.toLowerCase().includes('error') &&
+            !lastLine.toLowerCase().includes('failed')
+          ) {
+            const meaningfulUpdate = this.extractMeaningfulProgress(lastLine);
+            if (meaningfulUpdate) {
+              spinner.text = `Installing ${commandName}: ${meaningfulUpdate}`;
+            }
+          }
+        }
+      });
+
+      // Handle process completion
+      child.on('close', (code) => {
+        if (code === 0) {
+          resolve({ success: true });
+        } else {
+          // Try to extract meaningful error message
+          const fullError =
+            errorBuffer.trim() || outputBuffer.trim() || `Command failed with exit code: ${code}`;
+          const meaningfulError = this.extractMeaningfulError(fullError, commandName);
+          resolve({
+            success: false,
+            error: meaningfulError,
+          });
+        }
+      });
+
+      // Handle process errors
+      child.on('error', (error) => {
+        resolve({
+          success: false,
+          error: `Failed to start: ${error.message}`,
+        });
+      });
+    });
   }
 
   /**

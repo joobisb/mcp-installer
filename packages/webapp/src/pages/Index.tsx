@@ -33,6 +33,7 @@ import MoreClientsIndicator from '@/components/MoreClientsIndicator';
 import BetaBadge from '@/components/ui/beta-badge';
 import ServerRequestFAB from '@/components/ServerRequestFAB';
 import { getServersData, type RegistryData, type MCPServer } from '@/lib/registry';
+import { generateCursorDeepLink } from '@/lib/utils';
 
 const categoryIcons = {
   development: Code,
@@ -156,6 +157,26 @@ const Index = () => {
     return clientCommands[client] || baseCommand;
   };
 
+  const handleCursorInstall = (server) => {
+    try {
+      const deepLink = generateCursorDeepLink(server);
+      window.open(deepLink, '_blank');
+      toast({
+        title: 'Opening Cursor...',
+        description: "If Cursor doesn't open, please install it first.",
+        duration: 3000,
+      });
+    } catch (err) {
+      console.error('Failed to generate Cursor deep link:', err);
+      toast({
+        title: 'Failed to open Cursor',
+        description: 'Please try copying the install command instead.',
+        variant: 'destructive',
+        duration: 3000,
+      });
+    }
+  };
+
   // Show loading state
   if (isLoading) {
     return (
@@ -249,47 +270,53 @@ const Index = () => {
             {/* Centered subtitle section */}
             <div className="text-center mb-8">
               <div className="max-w-3xl mx-auto">
-                {/* Subtitle with glass effect */}
-                <div className="backdrop-blur-sm bg-white/40 px-6 py-5 rounded-2xl border border-orange-200/50 shadow-lg">
-                  <p className="text-lg md:text-xl text-amber-800 font-medium leading-relaxed mb-2">
-                    Search your MCP server and copy install commands with one-click simplicity!
-                  </p>
-                  <p className="text-base md:text-lg text-amber-700 font-normal">
-                    Effortless server setup for all your AI clients
-                  </p>
-                </div>
+                <p className="text-xl md:text-2xl text-amber-800 font-medium leading-relaxed mb-3">
+                  Browse, discover, and install MCP servers instantly
+                </p>
+                <p className="text-base md:text-lg text-amber-700 font-normal mb-6">
+                  One-click setup for Cursor, Claude, Gemini, and more
+                </p>
               </div>
             </div>
 
-            {/* Prerequisite Banner with reduced height */}
-            <div className="backdrop-blur-md bg-amber-50/60 border border-amber-200/50 rounded-2xl p-4 mb-6 shadow-lg">
-              <div className="flex items-center space-x-4">
-                <div className="p-2 bg-amber-500/10 rounded-xl backdrop-blur-sm">
+            {/* Quick Setup */}
+            <div className="backdrop-blur-md bg-amber-50/60 border border-amber-200/50 rounded-2xl p-6 shadow-lg max-w-2xl mx-auto mb-8">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="p-2 bg-amber-500/10 rounded-xl">
                   <AlertCircle className="h-5 w-5 text-amber-600" />
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-amber-900 mb-1">
-                    Prerequisite Required
-                  </h3>
-                  <p className="text-amber-700 mb-2 text-sm">
-                    Install the MCP installer CLI tool first:
-                  </p>
-                  <div className="backdrop-blur-sm bg-white/70 rounded-xl border border-white/50 px-4 py-2 font-mono text-sm text-amber-900 flex items-center justify-between shadow-inner">
-                    <span>npm install -g @mcp-installer/cli</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => copyToClipboard('npm install -g @mcp-installer/cli')}
-                      className="h-8 px-3 text-amber-600 hover:text-amber-800 hover:bg-amber-100/50 backdrop-blur-sm"
-                    >
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                  </div>
+                <h3 className="text-lg font-semibold text-amber-900">Prerequisite Required</h3>
+              </div>
+              <p className="text-amber-700 mb-4 text-sm">
+                First, install the MCP Installer CLI tool, then copy the install command for your
+                chosen server.
+              </p>
+              <div className="bg-white/70 rounded-xl border border-white/50 px-4 py-3 font-mono text-sm text-amber-900 flex items-center justify-between shadow-inner mb-4">
+                <span>npm install -g @mcp-installer/cli</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => copyToClipboard('npm install -g @mcp-installer/cli')}
+                  className="h-8 px-3 text-amber-600 hover:text-amber-800 hover:bg-amber-100/50 backdrop-blur-sm"
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Cursor Alternative */}
+              <div className="border-t border-amber-200/50 pt-4">
+                <div className="flex items-center space-x-2 mb-2">
+                  <img src="/icons/clients/cursor.svg" alt="Cursor" className="h-4 w-4" />
+                  <span className="text-sm font-medium text-amber-800">Cursor users:</span>
                 </div>
+                <p className="text-xs text-amber-700">
+                  Click the Cursor icon on any server for direct installation (requires dependencies
+                  to be pre-installed). For complete dependency management, use the mcp-installer.
+                </p>
               </div>
             </div>
 
-            {/* Search Bar with enhanced glass effect */}
+            {/* Search Bar */}
             <div className="relative max-w-2xl mx-auto">
               <div className="relative backdrop-blur-xl bg-white/60 rounded-2xl border border-orange-200/50 shadow-xl p-2">
                 <div className="relative">
@@ -390,6 +417,28 @@ const Index = () => {
                         <Copy className="h-4 w-4 mr-2" />
                         Install
                       </Button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-amber-700 hover:bg-amber-100/50"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCursorInstall(server);
+                            }}
+                          >
+                            <img
+                              src="/icons/clients/cursor.svg"
+                              alt="Install to Cursor"
+                              className="h-4 w-4"
+                            />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Install to Cursor</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                     <div className="flex items-center space-x-2">
                       {server.documentation && (
