@@ -1,0 +1,84 @@
+name: Windows Tests
+
+on:
+  push:
+    branches: [ feat/windows ]
+    paths:
+      - 'packages/cli/**'
+      - '.github/workflows/test-windows.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'packages/cli/**'
+      - '.github/workflows/test-windows.yml'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  test-windows:
+    runs-on: windows-latest
+    
+    strategy:
+      matrix:
+        node-version: [18, 20]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+        
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+      
+    - name: Build packages
+      run: pnpm run build
+      
+    - name: Run CLI tests on Windows
+      run: |
+        cd packages/cli
+        pnpm test
+      env:
+        NODE_ENV: test
+        
+    - name: Test actual MCP installer on Windows
+      run: |
+        cd packages/cli
+        # Build and test the actual CLI
+        pnpm run build
+        # Test help command
+        node dist/index.js --help
+        # Test list command (should work without config)
+        node dist/index.js list
+      env:
+        NODE_ENV: test
+        
+    - name: Test Windows path handling
+      run: |
+        cd packages/cli
+        # Create a test script to verify Windows path handling
+        node -e "
+          const { ConfigEngine } = require('./dist/core/config-engine.js');
+          const path = require('path');
+          const os = require('os');
+          
+          console.log('Testing Windows path handling...');
+          console.log('OS Platform:', process.platform);
+          console.log('Home directory:', os.homedir());
+          console.log('User profile:', process.env.USERPROFILE);
+          
+          const configEngine = new ConfigEngine();
+          console.log('ConfigEngine created successfully');
+          
+          // Test path construction
+          const testPath = path.join(os.homedir(), '.cursor', 'mcp.json');
+          console.log('Test config path:', testPath);
+        "
+      shell: cmd 

@@ -1,6 +1,6 @@
 import fsExtra from 'fs-extra';
 const { readFile, writeFile, ensureDir, copy } = fsExtra;
-import { dirname, join } from 'path';
+import { dirname, join, basename } from 'path';
 import { existsSync } from 'fs';
 import {
   ClientType,
@@ -297,8 +297,4 @@ export class ConfigEngine {
     // This would need more sophisticated logic to determine the original path
     throw new Error('Cannot infer original path from backup. Please specify target path.');
   }
-}
-
-function basename(path: string): string {
-  return path.split('/').pop() || path.split('\\').pop() || path;
 }
