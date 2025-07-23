@@ -32,6 +32,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/**/*.ts",
     "test": "jest",
+    "test:windows": "jest --config jest-windows.config.cjs",
     "test:watch": "jest --watch",
     "prepublishOnly": "pnpm run clean && pnpm run build"
   },

@@ -1,0 +1,119 @@
+name: Windows Backup Path Test
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'packages/cli/src/core/config-engine.ts'
+      - 'packages/cli/tests/config-engine.test.ts'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'packages/cli/src/core/config-engine.ts'
+      - 'packages/cli/tests/config-engine.test.ts'
+  workflow_dispatch:
+
+jobs:
+  windows-backup-test:
+    runs-on: windows-latest
+    
+    strategy:
+      matrix:
+        node-version: [18]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+    
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: latest
+    
+    - name: Install dependencies (root)
+      run: pnpm install --frozen-lockfile
+    
+    - name: Build shared package
+      run: pnpm run build
+      working-directory: ./packages/shared
+    
+    - name: Build CLI package
+      run: pnpm run build
+      working-directory: ./packages/cli
+    
+    - name: Run Windows backup path tests only
+      shell: powershell
+      run: |
+        # Run Windows-specific tests using the dedicated Jest config
+        pnpm run test:windows
+      working-directory: ./packages/cli
+      env:
+        INCLUDE_WINDOWS_TESTS: true
+      
+    - name: Test actual install command on Windows
+      shell: powershell
+      run: |
+        # Test the actual mcp-installer install command to verify backup paths work
+        Write-Host "Testing mcp-installer install with Windows paths..."
+        
+        # Create a mock Claude config to test backup creation
+        $claudeDir = "$env:USERPROFILE\.claude"
+        $configPath = "$claudeDir\config.json"
+        New-Item -ItemType Directory -Force -Path $claudeDir
+        '{"mcpServers": {}}' | Out-File -FilePath $configPath -Encoding UTF8
+        Write-Host "Created test config at: $configPath"
+        
+        # Try to run install command (may fail due to missing dependencies, but should create backup)
+        try {
+          Write-Host "Running: node dist/index.js install memory --clients=claude-code"
+          node dist/index.js install memory --clients=claude-code
+          Write-Host "Install command completed successfully"
+        } catch {
+          Write-Host "Install command failed (expected due to missing dependencies), but backup should still be created"
+        }
+        
+        # Check if backup was created with sanitized filename
+        $backupDir = "$env:USERPROFILE\.mcp-installer\backups"
+        Write-Host "Checking backup directory: $backupDir"
+        
+        if (Test-Path $backupDir) {
+          Write-Host "Backup directory exists"
+          $backupFiles = Get-ChildItem -Path $backupDir -Filter "*.backup" -ErrorAction SilentlyContinue
+          
+          if ($backupFiles -and $backupFiles.Count -gt 0) {
+            Write-Host "✅ Backup created successfully:"
+            $backupFiles | ForEach-Object { Write-Host "  - $($_.Name)" }
+            
+            # Verify no invalid characters in backup filename
+            $hasInvalidChars = $false
+            $backupFiles | ForEach-Object {
+              if ($_.Name -match '[<>:"|?*\\]') {
+                Write-Host "❌ Backup filename contains invalid characters: $($_.Name)"
+                $hasInvalidChars = $true
+              }
+            }
+            
+            if (-not $hasInvalidChars) {
+              Write-Host "✅ All backup filenames are valid for Windows"
+            } else {
+              exit 1
+            }
+          } else {
+            Write-Host "⚠️ No backup files found in directory"
+            # List all files in backup directory for debugging
+            $allFiles = Get-ChildItem -Path $backupDir -ErrorAction SilentlyContinue
+            if ($allFiles) {
+              Write-Host "Files in backup directory:"
+              $allFiles | ForEach-Object { Write-Host "  - $($_.Name)" }
+            }
+          }
+        } else {
+          Write-Host "⚠️ Backup directory does not exist: $backupDir"
+        }
+      working-directory: ./packages/cli
+      continue-on-error: true
+    

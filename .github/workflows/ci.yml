@@ -47,7 +47,7 @@ jobs:
           node dist/index.js list --available
           node dist/index.js doctor
 
-      - name: Run tests
+      - name: Run tests (excluding Windows-specific tests)
         run: pnpm -r run test
         continue-on-error: true  # Allow CI to pass despite test failures (for now)
 

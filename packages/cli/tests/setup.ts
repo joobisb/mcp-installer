@@ -57,6 +57,9 @@ jest.mock('fs-extra', () => {
       return new Promise((resolve, reject) => {
         try {
           const content = memfs.vol.readFileSync(src);
+          // Ensure destination directory exists
+          const destDir = require('path').dirname(dest);
+          memfs.vol.mkdirSync(destDir, { recursive: true });
           memfs.vol.writeFileSync(dest, content);
           resolve(undefined);
         } catch (error) {

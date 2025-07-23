@@ -9,9 +9,8 @@ module.exports = {
   },
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
   roots: ['<rootDir>/src', '<rootDir>/tests'],
-  testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
-  // Exclude Windows-specific tests from main CI runs
-  testPathIgnorePatterns: process.env.INCLUDE_WINDOWS_TESTS ? [] : ['.*windows.*\\.test\\.ts$'],
+  // Only run Windows-specific tests
+  testMatch: ['**/*windows*.test.ts'],
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/index.ts',
@@ -22,4 +21,4 @@ module.exports = {
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
-};
+}; 

@@ -228,6 +228,38 @@ describe('ConfigEngine', () => {
     });
   });
 
+  describe('createBackup', () => {
+    it('should handle Unix paths normally', async () => {
+      const unixConfigPath = '/Users/test/.cursor/mcp.json';
+      const testConfig = {
+        mcpServers: {
+          'filesystem': {
+            command: 'npx',
+            args: ['@modelcontextprotocol/server-filesystem']
+          }
+        }
+      };
+
+      vol.fromJSON({
+        [unixConfigPath]: JSON.stringify(testConfig)
+      });
+
+      const backup = await configEngine.createBackup(unixConfigPath);
+      
+      expect(backup.backupPath).toBeDefined();
+      expect(backup.backupPath).toContain('_Users_test_');
+      expect(backup.configPath).toBe(unixConfigPath);
+      expect(backup.timestamp).toBeDefined();
+    });
+
+    it('should throw error when config file does not exist', async () => {
+      const nonExistentPath = '/Users/nonexistent/.cursor/config.json';
+
+      await expect(configEngine.createBackup(nonExistentPath))
+        .rejects.toThrow('Config file does not exist');
+    });
+  });
+
   describe('validateConfig', () => {
     it('should validate correct config', async () => {
       const validConfig = {

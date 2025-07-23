@@ -100,11 +100,11 @@ describe('installCommand', () => {
       promptAndInstallMissingCommands: jest.fn(),
     } as any;
 
-    (ServerRegistry as jest.Mock).mockImplementation(() => mockServerRegistry);
-    (ClientManager as jest.Mock).mockImplementation(() => mockClientManager);
-    (ConfigEngine as jest.Mock).mockImplementation(() => mockConfigEngine);
-    (ParameterHandler as jest.Mock).mockImplementation(() => mockParameterHandler);
-    (CommandValidator as jest.Mock).mockImplementation(() => mockCommandValidator);
+    (ServerRegistry as jest.MockedClass<typeof ServerRegistry>).mockImplementation(() => mockServerRegistry);
+    (ClientManager as jest.MockedClass<typeof ClientManager>).mockImplementation(() => mockClientManager);
+    (ConfigEngine as jest.MockedClass<typeof ConfigEngine>).mockImplementation(() => mockConfigEngine);
+    (ParameterHandler as jest.MockedClass<typeof ParameterHandler>).mockImplementation(() => mockParameterHandler);
+    (CommandValidator as jest.MockedClass<typeof CommandValidator>).mockImplementation(() => mockCommandValidator);
 
     // Setup console and process mocks
     consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
@@ -120,9 +120,9 @@ describe('installCommand', () => {
     id: 'test-server',
     name: 'Test Server',
     description: 'A test server',
-    category: 'utility',
-    type: 'stdio',
-    difficulty: 'simple',
+    category: 'utility' as const,
+    type: 'stdio' as const,
+    difficulty: 'simple' as const,
     requiresAuth: false,
     installation: {
       command: 'npx',
@@ -133,14 +133,14 @@ describe('installCommand', () => {
 
   const mockClients = [
     {
-      type: 'claude-desktop',
+      type: 'claude-desktop' as const,
       isInstalled: true,
       configPath: '/test/claude.json',
       name: 'Claude Desktop',
       configExists: true,
     },
     {
-      type: 'cursor',
+      type: 'cursor' as const,
       isInstalled: true,
       configPath: '/test/cursor.json',
       name: 'Cursor',
@@ -474,7 +474,7 @@ describe('installCommand', () => {
         args: ['test-package', '--param1', 'value1'],
         env: undefined,
       });
-      (inquirer.prompt as jest.Mock).mockResolvedValue({ confirm: true });
+      (inquirer.prompt as jest.MockedFunction<typeof inquirer.prompt>).mockResolvedValue({ confirm: true });
 
       await installCommand('test-server', { clients: 'all' });
 
@@ -496,7 +496,7 @@ describe('installCommand', () => {
       mockParameterHandler.hasParameters.mockReturnValue(true);
       mockParameterHandler.promptForParameters.mockResolvedValue({});
       mockParameterHandler.previewCommand.mockReturnValue('npx test-package');
-      (inquirer.prompt as jest.Mock).mockResolvedValue({ confirm: false });
+      (inquirer.prompt as jest.MockedFunction<typeof inquirer.prompt>).mockResolvedValue({ confirm: false });
 
       await installCommand('test-server', { clients: 'all' });
 
@@ -542,7 +542,20 @@ describe('installCommand', () => {
     it('should handle server not found', async () => {
       mockServerRegistry.getServer.mockResolvedValue(null);
       mockServerRegistry.getAllServers.mockResolvedValue([
-        { id: 'other-server', description: 'Other server' },
+        { 
+          id: 'other-server', 
+          name: 'Other Server',
+          description: 'Other server',
+          category: 'utility' as const,
+          type: 'stdio' as const,
+          difficulty: 'simple' as const,
+          requiresAuth: false,
+          installation: {
+            command: 'npx',
+            args: ['other-package'],
+          },
+          documentation: 'https://example.com',
+        },
       ]);
 
       await installCommand('nonexistent-server', { clients: 'all' });
@@ -778,7 +791,7 @@ describe('installCommand', () => {
         failedCommands: [],
         userDeclined: false,
       });
-      (inquirer.prompt as jest.Mock).mockResolvedValue({ proceed: true });
+      (inquirer.prompt as jest.MockedFunction<typeof inquirer.prompt>).mockResolvedValue({ proceed: true });
 
       await installCommand('test-server', { clients: 'all' });
 
