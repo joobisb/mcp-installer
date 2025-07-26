@@ -112,7 +112,7 @@ export async function listCommand(options: ListOptions): Promise<void> {
 
       if (targetClients.length === 0) {
         spinner.succeed(chalk.yellow('No supported AI clients detected'));
-        console.log(chalk.dim('Supported clients: Claude Desktop, Cursor, Gemini'));
+        console.log(chalk.dim('Supported clients: Claude Desktop, Cursor, Gemini, VSCode'));
         return;
       }
 

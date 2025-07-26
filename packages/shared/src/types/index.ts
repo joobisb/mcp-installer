@@ -53,7 +53,8 @@ export interface MCPServerConfig {
 }
 
 export interface ClientConfig {
-  mcpServers: Record<string, MCPServerConfig>;
+  mcpServers?: Record<string, MCPServerConfig>;
+  servers?: Record<string, MCPServerConfig>;
   [key: string]: any;
 }
 
@@ -71,7 +72,11 @@ export interface GeminiConfig extends ClientConfig {
   mcpServers: Record<string, MCPServerConfig>;
 }
 
-export type ClientType = 'claude-desktop' | 'cursor' | 'gemini' | 'claude-code';
+export interface VSCodeConfig extends ClientConfig {
+  servers: Record<string, MCPServerConfig>;
+}
+
+export type ClientType = 'claude-desktop' | 'cursor' | 'gemini' | 'claude-code' | 'vscode';
 
 export interface ClientInfo {
   type: ClientType;

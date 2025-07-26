@@ -39,6 +39,9 @@ export class ClientManager {
       name: 'Gemini',
       configPaths: [join(homedir(), '.gemini', 'settings.json')], //TODO: Verify for linux and Windows
       detectCommand: 'gemini',
+      configTemplate: {
+        mcpServers: {},
+      },
       //settings.json already exists for geming, so no need to auto-create config
     },
     'claude-code': {
@@ -47,7 +50,23 @@ export class ClientManager {
         join(homedir(), '.claude.json'), // Global configuration TODO: Verify for linux and Windows
       ],
       detectCommand: 'claude',
+      configTemplate: {
+        mcpServers: {},
+      },
       //claude.json already exists for claude-code, so no need to auto-create config
+    },
+    vscode: {
+      name: 'Visual Studio Code',
+      configPaths: [
+        join(homedir(), 'Library', 'Application Support', 'Code', 'User', 'mcp.json'), // macOS global
+        join(homedir(), '.config', 'Code', 'User', 'mcp.json'), // Linux
+        join(homedir(), 'AppData', 'Roaming', 'Code', 'mcp.json'), // Windows
+        join(homedir(), '.vscode', 'mcp.json'), // Project-level configuration, yet to support project-level config
+      ],
+      detectCommand: 'code',
+      configTemplate: {
+        servers: {},
+      },
     },
   };
 
@@ -153,5 +172,9 @@ export class ClientManager {
 
   isClientSupported(type: string): type is ClientType {
     return type in ClientManager.CLIENT_CONFIGS;
+  }
+
+  getClientConfig(type: ClientType) {
+    return ClientManager.CLIENT_CONFIGS[type];
   }
 }

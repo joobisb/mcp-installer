@@ -13,6 +13,8 @@ import {
   Github,
   Loader2,
   Plus,
+  X,
+  Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -73,6 +75,7 @@ const Index = () => {
   const [serversData, setServersData] = useState<RegistryData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showVSCodeAnnouncement, setShowVSCodeAnnouncement] = useState(true);
   const { toast } = useToast();
 
   // Load registry data on component mount
@@ -153,6 +156,7 @@ const Index = () => {
       cursor: `mcp-installer install ${server.id} --clients=cursor`,
       continue: `mcp-installer install ${server.id} --clients=gemini`,
       gemini: `mcp-installer install ${server.id} --clients=gemini`,
+      vscode: `mcp-installer install ${server.id} --clients=vscode`,
     };
     return clientCommands[client] || baseCommand;
   };
@@ -267,6 +271,36 @@ const Index = () => {
               </div>
             </div>
 
+            {/* VSCode Announcement Banner */}
+            {showVSCodeAnnouncement && (
+              <div className="mb-6">
+                <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl border border-blue-300/50 shadow-xl">
+                  <div className="px-6 py-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <Sparkles className="h-5 w-5 text-yellow-300" />
+                        <div className="flex items-center space-x-2">
+                          <img src="/icons/clients/vscode.svg" alt="VSCode" className="h-5 w-5" />
+                          <span className="font-semibold">VSCode support is now available!</span>
+                        </div>
+                        <span className="text-blue-100">
+                          Install MCP servers directly to Visual Studio Code.
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setShowVSCodeAnnouncement(false)}
+                        className="text-white hover:bg-white/20 h-8 w-8"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Centered subtitle section */}
             <div className="text-center mb-8">
               <div className="max-w-3xl mx-auto">
@@ -364,7 +398,7 @@ const Index = () => {
 
       {/* Server Grid */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
           {filteredServers.map((server) => {
             const CategoryIcon = categoryIcons[server.category] || Package;
 
@@ -645,11 +679,12 @@ const Index = () => {
                   <h4 className="font-medium text-gray-900 mb-4">Installation Commands</h4>
 
                   <Tabs defaultValue="universal" className="w-full">
-                    <TabsList className="grid w-full grid-cols-4">
+                    <TabsList className="grid w-full grid-cols-5">
                       <TabsTrigger value="universal">All Clients</TabsTrigger>
                       <TabsTrigger value="claude">Claude</TabsTrigger>
                       <TabsTrigger value="cursor">Cursor</TabsTrigger>
                       <TabsTrigger value="gemini">Gemini CLI</TabsTrigger>
+                      <TabsTrigger value="vscode">VSCode</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="universal" className="mt-4">
@@ -753,6 +788,31 @@ const Index = () => {
                         </code>
                         <p className="text-xs text-gray-500 mt-2">
                           This will install the server only to Cursor
+                        </p>
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="vscode" className="mt-4">
+                      <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
+                        <div className="flex items-center justify-between mb-2">
+                          <h5 className="font-medium text-gray-900">Install to VSCode Only</h5>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              copyToClipboard(getClientSpecificCommand(selectedServer, 'vscode'))
+                            }
+                            className="text-amber-600 hover:text-amber-800"
+                          >
+                            <Copy className="h-4 w-4 mr-1" />
+                            Copy
+                          </Button>
+                        </div>
+                        <code className="block text-sm font-mono text-gray-800 bg-white p-3 rounded border">
+                          {getClientSpecificCommand(selectedServer, 'vscode')}
+                        </code>
+                        <p className="text-xs text-gray-500 mt-2">
+                          This will install the server only to VSCode
                         </p>
                       </div>
                     </TabsContent>

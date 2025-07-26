@@ -18,7 +18,6 @@ export async function uninstallCommand(
 
   try {
     const clientManager = new ClientManager();
-    const configEngine = new ConfigEngine();
 
     spinner.text = 'Detecting installed clients...';
     const allClients = await clientManager.detectInstalledClients();
@@ -67,6 +66,7 @@ export async function uninstallCommand(
     for (const clientType of targetClients) {
       const clientInfo = allClients.find((c) => c.type === clientType)!;
       try {
+        const configEngine = new ConfigEngine(clientType);
         const installedServers = await configEngine.listInstalledServers(clientInfo.configPath);
         if (installedServers[serverName]) {
           installedClients.push({ client: clientType, configPath: clientInfo.configPath });
@@ -121,6 +121,7 @@ export async function uninstallCommand(
       spinner.start(`Uninstalling from ${getClientDisplayName(client)}...`);
 
       try {
+        const configEngine = new ConfigEngine(client);
         await configEngine.uninstallServer(configPath, serverName, { backup: options.backup });
 
         results.push({

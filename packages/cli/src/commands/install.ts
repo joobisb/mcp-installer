@@ -24,7 +24,6 @@ export async function installCommand(serverName: string, options: InstallOptions
   try {
     const serverRegistry = new ServerRegistry();
     const clientManager = new ClientManager();
-    const configEngine = new ConfigEngine();
     const parameterHandler = new ParameterHandler();
 
     spinner.text = 'Loading server registry...';
@@ -50,7 +49,7 @@ export async function installCommand(serverName: string, options: InstallOptions
       if (targetClients.length === 0) {
         spinner.fail(chalk.red('No supported AI clients detected'));
         console.log(
-          chalk.yellow('\nSupported clients: Claude Desktop, Claude Code, Cursor, Gemini')
+          chalk.yellow('\nSupported clients: Claude Desktop, Claude Code, Cursor, Gemini, VS Code')
         );
         console.log(chalk.yellow('Please install at least one client and try again.'));
         return;
@@ -65,6 +64,7 @@ export async function installCommand(serverName: string, options: InstallOptions
         'claude-desktop': 'claude-desktop',
         cursor: 'cursor',
         gemini: 'gemini',
+        vscode: 'vscode',
       };
 
       for (const requestedClient of requestedClients) {
@@ -112,7 +112,6 @@ export async function installCommand(serverName: string, options: InstallOptions
     // Check if server is already installed on target clients (unless force flag is used)
     if (!options.force) {
       spinner.text = 'Checking if server is already installed...';
-      const configEngine = new ConfigEngine();
       const alreadyInstalled: string[] = [];
       const clientsToInstall: ClientType[] = [];
 
@@ -120,6 +119,7 @@ export async function installCommand(serverName: string, options: InstallOptions
       for (const clientType of targetClients) {
         const clientInfo = allClients.find((c) => c.type === clientType);
         if (clientInfo?.isInstalled && clientInfo?.configExists) {
+          const configEngine = new ConfigEngine(clientType);
           if (await configEngine.isServerInstalled(clientInfo.configPath, server.id)) {
             alreadyInstalled.push(getClientDisplayName(clientType));
           } else {
@@ -349,6 +349,7 @@ export async function installCommand(serverName: string, options: InstallOptions
           env: env,
         };
 
+        const configEngine = new ConfigEngine(clientType);
         await configEngine.installServer(clientInfo.configPath, server.id, mcpConfig, {
           backup: options.backup,
           force: options.force,

@@ -1,3 +1,4 @@
+import '@jest/globals';
 import { vol } from 'memfs';
 import { ClientManager } from '../src/core/client-manager';
 
@@ -58,11 +59,19 @@ describe('ClientManager', () => {
     });
 
     it('should not detect clients when no configs exist', async () => {
+      // Mock execSync to simulate no commands found
+      const mockExecSync = jest.spyOn(require('child_process'), 'execSync');
+      mockExecSync.mockImplementation(() => {
+        throw new Error('Command not found');
+      });
+
       const clients = await clientManager.detectInstalledClients();
 
       clients.forEach((client) => {
         expect(client.isInstalled).toBe(false);
       });
+
+      mockExecSync.mockRestore();
     });
 
     it('should return all supported client types', async () => {
@@ -73,6 +82,7 @@ describe('ClientManager', () => {
       expect(clientTypes).toContain('cursor');
       expect(clientTypes).toContain('gemini');
       expect(clientTypes).toContain('claude-code');
+      expect(clientTypes).toContain('vscode');
     });
   });
 
@@ -107,11 +117,13 @@ describe('ClientManager', () => {
       expect(supportedClients).toContain('cursor');
       expect(supportedClients).toContain('gemini');
       expect(supportedClients).toContain('claude-desktop');
+      expect(supportedClients).toContain('vscode');
     });
 
     it('should validate client support', () => {
       expect(clientManager.isClientSupported('cursor')).toBe(true);
       expect(clientManager.isClientSupported('gemini')).toBe(true);
+      expect(clientManager.isClientSupported('vscode')).toBe(true);
       expect(clientManager.isClientSupported('invalid-client')).toBe(false);
     });
 

@@ -9,6 +9,7 @@ import {
   ValidationResult,
   BackupInfo,
 } from '@mcp-installer/shared';
+import { ClientManager } from './client-manager.js';
 
 export class ConfigEngine {
   private static readonly BACKUP_DIR = join(
@@ -17,17 +18,37 @@ export class ConfigEngine {
     'backups'
   );
 
+  private clientType?: ClientType;
+  private clientManager: ClientManager;
+
+  constructor(clientType?: ClientType) {
+    this.clientType = clientType;
+    this.clientManager = new ClientManager();
+  }
+
+  private getConfigKey(): string {
+    if (!this.clientType) return 'mcpServers'; // backward compatibility
+
+    const config = this.clientManager.getClientConfig(this.clientType);
+    if (!config?.configTemplate) return 'mcpServers';
+
+    const keys = Object.keys(config.configTemplate);
+    return keys.length > 0 ? keys[0] : 'mcpServers';
+  }
+
   async readConfig(configPath: string): Promise<ClientConfig> {
     try {
+      const configKey = this.getConfigKey();
+
       if (!existsSync(configPath)) {
-        return { mcpServers: {} };
+        return { [configKey]: {} } as ClientConfig;
       }
 
       const content = await readFile(configPath, 'utf-8');
       const config = JSON.parse(content) as ClientConfig;
 
-      if (!config.mcpServers) {
-        config.mcpServers = {};
+      if (!config[configKey]) {
+        config[configKey] = {};
       }
 
       return config;
@@ -87,7 +108,8 @@ export class ConfigEngine {
   async isServerInstalled(configPath: string, serverId: string): Promise<boolean> {
     try {
       const config = await this.readConfig(configPath);
-      return !!config.mcpServers[serverId];
+      const configKey = this.getConfigKey();
+      return !!config[configKey]?.[serverId];
     } catch {
       return false;
     }
@@ -100,8 +122,9 @@ export class ConfigEngine {
     options: { backup?: boolean; force?: boolean } = {}
   ): Promise<void> {
     const config = await this.readConfig(configPath);
+    const configKey = this.getConfigKey();
 
-    if (config.mcpServers[serverId] && !options.force) {
+    if (config[configKey]?.[serverId] && !options.force) {
       throw new Error(`Server '${serverId}' is already installed. Use --force to overwrite.`);
     }
 
@@ -109,7 +132,10 @@ export class ConfigEngine {
       await this.createBackup(configPath);
     }
 
-    config.mcpServers[serverId] = serverConfig;
+    if (!config[configKey]) {
+      config[configKey] = {};
+    }
+    config[configKey][serverId] = serverConfig;
     await this.writeConfig(configPath, config);
   }
 
@@ -119,8 +145,9 @@ export class ConfigEngine {
     options: { backup?: boolean } = {}
   ): Promise<void> {
     const config = await this.readConfig(configPath);
+    const configKey = this.getConfigKey();
 
-    if (!config.mcpServers[serverId]) {
+    if (!config[configKey]?.[serverId]) {
       throw new Error(`Server '${serverId}' is not installed.`);
     }
 
@@ -128,13 +155,14 @@ export class ConfigEngine {
       await this.createBackup(configPath);
     }
 
-    delete config.mcpServers[serverId];
+    delete config[configKey][serverId];
     await this.writeConfig(configPath, config);
   }
 
   async listInstalledServers(configPath: string): Promise<Record<string, MCPServerConfig>> {
     const config = await this.readConfig(configPath);
-    return config.mcpServers || {};
+    const configKey = this.getConfigKey();
+    return config[configKey] || {};
   }
 
   async validateConfig(configPath: string): Promise<ValidationResult> {
@@ -154,13 +182,15 @@ export class ConfigEngine {
 
       try {
         const config = JSON.parse(content) as ClientConfig;
+        const configKey = this.getConfigKey();
 
-        if (!config.mcpServers) {
-          result.warnings.push('No mcpServers section found in config');
+        if (!config[configKey]) {
+          result.warnings.push(`No ${configKey} section found in config`);
           return result;
         }
 
-        for (const [serverId, serverConfig] of Object.entries(config.mcpServers)) {
+        const serverConfigs = config[configKey] as Record<string, MCPServerConfig>;
+        for (const [serverId, serverConfig] of Object.entries(serverConfigs)) {
           if (!serverConfig) {
             result.errors.push(`Server '${serverId}' has empty configuration`);
             result.isValid = false;
@@ -278,6 +308,7 @@ export class ConfigEngine {
     if (configPath.includes('.cursor')) return 'cursor';
     if (configPath.includes('.gemini')) return 'gemini';
     if (configPath.includes('.claude.json')) return 'claude-code';
+    if (configPath.includes('.vscode')) return 'vscode';
     if (configPath.includes('Claude')) return 'claude-desktop';
     return 'claude-desktop'; // default
   }
@@ -288,6 +319,7 @@ export class ConfigEngine {
       cursor: 'Cursor',
       gemini: 'Gemini',
       'claude-code': 'Claude Code',
+      vscode: 'Visual Studio Code',
     };
     return displayNames[type] || type;
   }
