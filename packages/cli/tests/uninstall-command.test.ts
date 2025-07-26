@@ -63,14 +63,14 @@ describe('uninstallCommand', () => {
       isClientSupported: jest.fn(),
       getSupportedClients: jest.fn(),
     } as any;
-    (ClientManager as jest.Mock).mockImplementation(() => mockClientManager);
+    (ClientManager as jest.MockedClass<typeof ClientManager>).mockImplementation(() => mockClientManager);
 
     // Setup ConfigEngine mock
     mockConfigEngine = {
       listInstalledServers: jest.fn(),
       uninstallServer: jest.fn(),
     } as any;
-    (ConfigEngine as jest.Mock).mockImplementation(() => mockConfigEngine);
+    (ConfigEngine as jest.MockedClass<typeof ConfigEngine>).mockImplementation(() => mockConfigEngine);
 
     // Setup console and process mocks
     consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
@@ -120,7 +120,7 @@ describe('uninstallCommand', () => {
       });
 
       mockConfigEngine.uninstallServer.mockResolvedValue();
-      (inquirer.prompt as jest.Mock).mockResolvedValue({ proceed: true });
+      (inquirer.prompt as jest.MockedFunction<typeof inquirer.prompt>).mockResolvedValue({ proceed: true });
     });
 
     it('should successfully uninstall from all clients', async () => {
@@ -208,7 +208,7 @@ describe('uninstallCommand', () => {
     });
 
     it('should handle user cancellation', async () => {
-      (inquirer.prompt as jest.Mock).mockResolvedValue({ proceed: false });
+      (inquirer.prompt as jest.MockedFunction<typeof inquirer.prompt>).mockResolvedValue({ proceed: false });
 
       await uninstallCommand('test-server', { clients: 'all' });
 
@@ -295,7 +295,7 @@ describe('uninstallCommand', () => {
         .mockResolvedValueOnce() // Success for cursor
         .mockRejectedValueOnce(new Error('Uninstall failed')); // Error for gemini
 
-      (inquirer.prompt as jest.Mock).mockResolvedValue({ proceed: true });
+      (inquirer.prompt as jest.MockedFunction<typeof inquirer.prompt>).mockResolvedValue({ proceed: true });
 
       await uninstallCommand('test-server', { clients: 'all' });
 
@@ -330,7 +330,7 @@ describe('uninstallCommand', () => {
     });
 
     it('should show correct confirmation prompt', async () => {
-      (inquirer.prompt as jest.Mock).mockResolvedValue({ proceed: true });
+      (inquirer.prompt as jest.MockedFunction<typeof inquirer.prompt>).mockResolvedValue({ proceed: true });
 
       await uninstallCommand('test-server', { clients: 'all' });
 
@@ -345,7 +345,7 @@ describe('uninstallCommand', () => {
     });
 
     it('should display affected clients before confirmation', async () => {
-      (inquirer.prompt as jest.Mock).mockResolvedValue({ proceed: true });
+      (inquirer.prompt as jest.MockedFunction<typeof inquirer.prompt>).mockResolvedValue({ proceed: true });
 
       await uninstallCommand('test-server', { clients: 'all' });
 
