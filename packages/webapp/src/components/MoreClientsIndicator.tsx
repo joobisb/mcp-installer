@@ -12,7 +12,7 @@ const MoreClientsIndicator = () => {
         </div>
       </TooltipTrigger>
       <TooltipContent>
-        <p>VS Code, Windsurf & more coming soon</p>
+        <p>Windsurf & more coming soon</p>
       </TooltipContent>
     </Tooltip>
   );

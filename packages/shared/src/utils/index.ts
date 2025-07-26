@@ -6,6 +6,7 @@ export function getClientDisplayName(type: ClientType): string {
     cursor: 'Cursor',
     gemini: 'Gemini',
     'claude-code': 'Claude Code',
+    vscode: 'Visual Studio Code',
   };
   return displayNames[type] || type;
 }
