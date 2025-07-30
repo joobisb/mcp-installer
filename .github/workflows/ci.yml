@@ -49,7 +49,6 @@ jobs:
 
       - name: Run tests (excluding Windows-specific tests)
         run: pnpm -r run test
-        continue-on-error: true  # Allow CI to pass despite test failures (for now)
 
       - name: Test workspace dependency resolution
         run: |
