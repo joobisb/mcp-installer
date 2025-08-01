@@ -33,7 +33,8 @@ mcp-installer list --available
 | **Cursor**         | ✅ Supported |
 | **Gemini**         | ✅ Supported |
 | **Claude Desktop** | ✅ Supported |
-| **VS Code**        | 🔄 Planned   |
+| **VS Code**        | ✅ Supported |
+| **Kiro**           | ✅ Supported |
 
 ## 📦 Available MCP Servers
 
