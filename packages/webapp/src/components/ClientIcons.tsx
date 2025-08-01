@@ -62,7 +62,7 @@ const ClientIcons = () => {
           <div className="relative">
             <img
               src="/icons/clients/kiro.png"
-              alt="VSCode"
+              alt="Kiro"
               className="w-5 h-5 cursor-pointer hover:scale-110 transition-transform"
             />
           </div>
