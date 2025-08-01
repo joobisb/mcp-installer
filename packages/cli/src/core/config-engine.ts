@@ -309,6 +309,7 @@ export class ConfigEngine {
     if (configPath.includes('.gemini')) return 'gemini';
     if (configPath.includes('.claude.json')) return 'claude-code';
     if (configPath.includes('.vscode')) return 'vscode';
+    if (configPath.includes('.kiro')) return 'kiro';
     if (configPath.includes('Claude')) return 'claude-desktop';
     return 'claude-desktop'; // default
   }
@@ -320,6 +321,7 @@ export class ConfigEngine {
       gemini: 'Gemini',
       'claude-code': 'Claude Code',
       vscode: 'Visual Studio Code',
+      kiro: 'Kiro',
     };
     return displayNames[type] || type;
   }

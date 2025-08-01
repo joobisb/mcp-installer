@@ -34,12 +34,12 @@ const ClientIcons = () => {
         <TooltipTrigger asChild>
           <img
             src="/icons/clients/claude.svg"
-            alt="Claude Desktop"
+            alt="Claude Code"
             className="w-5 h-5 cursor-pointer hover:scale-110 transition-transform"
           />
         </TooltipTrigger>
         <TooltipContent>
-          <p>Claude Desktop</p>
+          <p>Claude Code</p>
         </TooltipContent>
       </Tooltip>
 
@@ -51,13 +51,24 @@ const ClientIcons = () => {
               alt="VSCode"
               className="w-5 h-5 cursor-pointer hover:scale-110 transition-transform"
             />
-            <div className="absolute -top-1 -right-1 bg-green-500 text-white text-[8px] font-bold px-1 py-0.5 rounded-full leading-none">
-              NEW
-            </div>
           </div>
         </TooltipTrigger>
         <TooltipContent>
           <p>Visual Studio Code</p>
+        </TooltipContent>
+      </Tooltip>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="relative">
+            <img
+              src="/icons/clients/kiro.png"
+              alt="VSCode"
+              className="w-5 h-5 cursor-pointer hover:scale-110 transition-transform"
+            />
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Kiro</p>
         </TooltipContent>
       </Tooltip>
     </div>
