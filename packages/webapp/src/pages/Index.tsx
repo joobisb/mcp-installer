@@ -157,6 +157,7 @@ const Index = () => {
       continue: `mcp-installer install ${server.id} --clients=gemini`,
       gemini: `mcp-installer install ${server.id} --clients=gemini`,
       vscode: `mcp-installer install ${server.id} --clients=vscode`,
+      kiro: `mcp-installer install ${server.id} --clients=kiro`,
     };
     return clientCommands[client] || baseCommand;
   };
@@ -281,10 +282,13 @@ const Index = () => {
                         <Sparkles className="h-5 w-5 text-yellow-300" />
                         <div className="flex items-center space-x-2">
                           <img src="/icons/clients/vscode.svg" alt="VSCode" className="h-5 w-5" />
-                          <span className="font-semibold">VSCode support is now available!</span>
+                          <img src="/icons/clients/kiro.png" alt="Kiro" className="h-5 w-5" />
+                          <span className="font-semibold">
+                            VSCode and Kiro support is now available!
+                          </span>
                         </div>
                         <span className="text-blue-100">
-                          Install MCP servers directly to Visual Studio Code.
+                          Install MCP servers directly to Visual Studio Code and Kiro.
                         </span>
                       </div>
                       <Button
@@ -398,57 +402,76 @@ const Index = () => {
 
       {/* Server Grid */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredServers.map((server) => {
             const CategoryIcon = categoryIcons[server.category] || Package;
 
             return (
               <Card
                 key={server.id}
-                className="flex flex-col transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-2xl hover:border-orange-300/80 bg-white/60 backdrop-blur-md border border-orange-200/50 shadow-lg rounded-2xl overflow-hidden"
+                className="flex flex-col h-full transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-2xl hover:border-orange-300/80 bg-white/60 backdrop-blur-md border border-orange-200/50 shadow-lg rounded-2xl overflow-hidden cursor-pointer"
                 onClick={() => setSelectedServer(server)}
               >
-                <CardHeader className="flex-shrink-0">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-grow">
-                      <div className="flex items-center space-x-3">
-                        <div className="p-2 bg-amber-100 rounded-lg group-hover:bg-amber-200 transition-colors">
-                          <CategoryIcon className="h-5 w-5 text-amber-600" />
-                        </div>
-                        <div>
-                          <div className="flex items-center space-x-2">
-                            <CardTitle className="text-lg font-semibold text-gray-900 group-hover:text-amber-900 transition-colors">
-                              {server.name}
-                            </CardTitle>
-                            <VerifiedBadge />
-                          </div>
-                          <p className="text-sm text-gray-500">by {server.author}</p>
-                        </div>
+                <CardHeader className="flex-shrink-0 pb-3">
+                  <div className="flex items-start space-x-3">
+                    <div className="p-2 bg-amber-100 rounded-lg group-hover:bg-amber-200 transition-colors flex-shrink-0">
+                      <CategoryIcon className="h-5 w-5 text-amber-600" />
+                    </div>
+                    <div className="flex-grow min-w-0">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <CardTitle className="text-lg font-semibold text-gray-900 group-hover:text-amber-900 transition-colors truncate">
+                          {server.name}
+                        </CardTitle>
+                        <VerifiedBadge />
                       </div>
+                      <p className="text-sm text-gray-500 truncate">by {server.author}</p>
                     </div>
                   </div>
                 </CardHeader>
 
-                <CardContent className="flex-grow flex flex-col">
-                  <CardDescription className="text-gray-600 mb-4 line-clamp-2 min-h-[40px]">
+                <CardContent className="flex-grow flex flex-col px-6 pb-3">
+                  <CardDescription className="text-gray-600 text-sm leading-relaxed line-clamp-3 flex-grow">
                     {server.description}
                   </CardDescription>
+
+                  {/* Tags */}
+                  {server.tags && server.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-3">
+                      {server.tags.slice(0, 3).map((tag) => (
+                        <Badge
+                          key={tag}
+                          variant="secondary"
+                          className="text-xs bg-amber-50 text-amber-700 border-amber-200 px-2 py-0.5"
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                      {server.tags.length > 3 && (
+                        <Badge
+                          variant="secondary"
+                          className="text-xs bg-gray-50 text-gray-600 border-gray-200 px-2 py-0.5"
+                        >
+                          +{server.tags.length - 3}
+                        </Badge>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
 
                 {/* Footer */}
-                <div className="mt-auto p-4 border-t border-orange-200/50 bg-amber-50/20">
+                <div className="mt-auto px-6 py-4 border-t border-orange-200/50 bg-amber-50/20">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center space-x-2">
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-amber-700 hover:bg-amber-100/50"
+                        className="text-amber-700 hover:bg-amber-100/50 text-xs px-3 py-2"
                         onClick={(e) => {
                           e.stopPropagation();
                           copyToClipboard(getInstallCommand(server));
                         }}
                       >
-                        <Copy className="h-4 w-4 mr-2" />
+                        <Copy className="h-3 w-3 mr-1" />
                         Install
                       </Button>
                       <Tooltip>
@@ -456,7 +479,7 @@ const Index = () => {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="text-amber-700 hover:bg-amber-100/50"
+                            className="text-amber-700 hover:bg-amber-100/50 h-8 w-8"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleCursorInstall(server);
@@ -474,20 +497,25 @@ const Index = () => {
                         </TooltipContent>
                       </Tooltip>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-1">
+                      <Badge
+                        className={`${difficultyColors[server.difficulty]} text-xs px-2 py-0.5`}
+                      >
+                        {server.difficulty}
+                      </Badge>
                       {server.documentation && (
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="text-amber-700 hover:bg-amber-100/50"
+                              className="text-amber-700 hover:bg-amber-100/50 h-8 w-8"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 window.open(server.documentation, '_blank');
                               }}
                             >
-                              <ExternalLink className="h-4 w-4" />
+                              <ExternalLink className="h-3 w-3" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -501,13 +529,13 @@ const Index = () => {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="text-amber-700 hover:bg-amber-100/50"
+                              className="text-amber-700 hover:bg-amber-100/50 h-8 w-8"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 window.open(server.repository, '_blank');
                               }}
                             >
-                              <Github className="h-4 w-4" />
+                              <Github className="h-3 w-3" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -679,12 +707,13 @@ const Index = () => {
                   <h4 className="font-medium text-gray-900 mb-4">Installation Commands</h4>
 
                   <Tabs defaultValue="universal" className="w-full">
-                    <TabsList className="grid w-full grid-cols-5">
+                    <TabsList className="grid w-full grid-cols-6">
                       <TabsTrigger value="universal">All Clients</TabsTrigger>
                       <TabsTrigger value="claude">Claude</TabsTrigger>
                       <TabsTrigger value="cursor">Cursor</TabsTrigger>
                       <TabsTrigger value="gemini">Gemini CLI</TabsTrigger>
                       <TabsTrigger value="vscode">VSCode</TabsTrigger>
+                      <TabsTrigger value="kiro">Kiro</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="universal" className="mt-4">
@@ -813,6 +842,31 @@ const Index = () => {
                         </code>
                         <p className="text-xs text-gray-500 mt-2">
                           This will install the server only to VSCode
+                        </p>
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="kiro" className="mt-4">
+                      <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
+                        <div className="flex items-center justify-between mb-2">
+                          <h5 className="font-medium text-gray-900">Install to Kiro Only</h5>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              copyToClipboard(getClientSpecificCommand(selectedServer, 'kiro'))
+                            }
+                            className="text-amber-600 hover:text-amber-800"
+                          >
+                            <Copy className="h-4 w-4 mr-1" />
+                            Copy
+                          </Button>
+                        </div>
+                        <code className="block text-sm font-mono text-gray-800 bg-white p-3 rounded border">
+                          {getClientSpecificCommand(selectedServer, 'kiro')}
+                        </code>
+                        <p className="text-xs text-gray-500 mt-2">
+                          This will install the server only to Kiro
                         </p>
                       </div>
                     </TabsContent>

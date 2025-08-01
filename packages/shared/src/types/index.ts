@@ -76,7 +76,7 @@ export interface VSCodeConfig extends ClientConfig {
   servers: Record<string, MCPServerConfig>;
 }
 
-export type ClientType = 'claude-desktop' | 'cursor' | 'gemini' | 'claude-code' | 'vscode';
+export type ClientType = 'claude-desktop' | 'cursor' | 'gemini' | 'claude-code' | 'vscode' | 'kiro';
 
 export interface ClientInfo {
   type: ClientType;

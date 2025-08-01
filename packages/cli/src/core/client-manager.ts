@@ -68,6 +68,12 @@ export class ClientManager {
         servers: {},
       },
     },
+    kiro: {
+      name: 'Kiro',
+      configPaths: [
+        join(homedir(), '.kiro', 'settings', 'mcp.json'), // macOS/Linux
+      ],
+    },
   };
 
   async detectInstalledClients(): Promise<ClientInfo[]> {
