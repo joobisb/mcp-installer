@@ -1,6 +1,6 @@
 {
   "name": "@mcp-installer/shared",
-  "version": "0.3.19",
+  "version": "0.3.20",
   "type": "module",
   "description": "Shared types and utilities for MCP Installer",
   "main": "dist/src/index.js",
