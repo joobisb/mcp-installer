@@ -2487,6 +2487,36 @@
       "author": "GreptimeTeam",
       "tags": ["database", "time-series", "analytics", "monitoring"],
       "validatedOn": "2025-01-02"
+    },
+    {
+      "id": "windows-mcp",
+      "name": "Windows-MCP",
+      "description": "Windows MCP is a lightweight, open-source project that enables seamless integration between AI agents and the Windows operating system. Acting as an MCP server bridges the gap between LLMs and the Windows operating system, allowing agents to perform tasks such as file navigation, application control, UI interaction, QA testing, and more.",
+      "category": "ai",
+      "type": "stdio",
+      "difficulty": "complex",
+      "requiresAuth": false,
+      "parameters": {
+        "repository_path": {
+          "type": "directory_path",
+          "required": true,
+          "description": "Path to the cloned Windows-MCP repository directory"
+        }
+      },
+      "installation": {
+        "command": "uv",
+        "args": [
+          "--directory",
+          "{{repository_path}}",
+          "run",
+          "main.py"
+        ]
+      },
+      "documentation": "https://github.com/CursorTouch/Windows-MCP/blob/main/README.md",
+      "repository": "https://github.com/CursorTouch/Windows-MCP",
+      "author": "CursorTouch",
+      "tags": ["windows", "ai", "ui-interaction", "file-navigation", "computer-use"],
+      "validatedOn": "2025-01-02"
     }
   ]
 }
